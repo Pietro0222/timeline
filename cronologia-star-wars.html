@@ -1461,15 +1461,15 @@ document.addEventListener("dragstart", ev=>{
    ========================================================================= */
 
 const ERE = [
-  {id:"vecchia",   nome:"Vecchia Repubblica",      span:"25000 – 1000 BBY", breve:"Vecchia\nRepubblica", c:"#8D79C6"},
+  {id:"vecchia",   nome:"Vecchia Repubblica",      span:"25000 – 1000 BBY", breve:"Vecchia\nRepubblica", c:"#8D79C6", simbolo:"vecchia.png"},
   {id:"alta",      nome:"Alta Repubblica",         span:"500 – 100 BBY",   breve:"Alta\nRepubblica", c:"#F0C05A"},
-  {id:"caduta",    nome:"Caduta della Repubblica", span:"100 – 19 BBY",     breve:"Caduta della\nRepubblica", c:"#3B6FE0"},
-  {id:"impero",    nome:"Regno dell'Impero",       span:"19 – 5 BBY",      breve:"Regno\ndell'Impero", c:"#E23A4E"},
-  {id:"ribellione",nome:"Era della Ribellione",    span:"5 BBY – 4 ABY",   breve:"Era della\nRibellione", c:"#E86F4B"},
-  {id:"nuova",     nome:"Nuova Repubblica",        span:"4 – 34 ABY",      breve:"Nuova\nRepubblica", c:"#58C08A"},
-  {id:"ordine",    nome:"Ascesa del Primo Ordine", span:"34 – 35 ABY",     breve:"Ascesa del\nPrimo Ordine", c:"#E33161"},
+  {id:"caduta",    nome:"Caduta della Repubblica", span:"100 – 19 BBY",     breve:"Caduta della\nRepubblica", c:"#3B6FE0", simbolo:"caduta.png"},
+  {id:"impero",    nome:"Regno dell'Impero",       span:"19 – 5 BBY",      breve:"Regno\ndell'Impero", c:"#E23A4E", simbolo:"impero.png"},
+  {id:"ribellione",nome:"Era della Ribellione",    span:"5 BBY – 4 ABY",   breve:"Era della\nRibellione", c:"#E86F4B", simbolo:"ribellione.png"},
+  {id:"nuova",     nome:"Nuova Repubblica",        span:"4 – 34 ABY",      breve:"Nuova\nRepubblica", c:"#58C08A", simbolo:"nuova.png"},
+  {id:"ordine",    nome:"Ascesa del Primo Ordine", span:"34 – 35 ABY",     breve:"Ascesa del\nPrimo Ordine", c:"#E33161", simbolo:"ordine.png"},
   {id:"jedi",      nome:"Nuovo Ordine Jedi",       span:"35 ABY – futuro", breve:"Nuovo Ordine\nJedi", c:"#E7D9A6", simbolo:"logo new jedi order.webp"},
-  {id:"fuori",     nome:"Raccolte Antologiche",    span:"",       breve:"Raccolte\nAntologiche", c:"#4FB3D9"}
+  {id:"fuori",     nome:"Raccolte Antologiche",    span:"",       breve:"Raccolte\nAntologiche", c:"#4FB3D9", simbolo:"fuori.png"}
 ];
 
 const OPERE = [
@@ -1519,7 +1519,7 @@ const OPERE = [
    n:"Miniserie in quattro numeri pubblicata sullo spillato dell'Alta Repubblica."},
   {ti:"L'Alta Repubblica – L'Equilibrio in Bilico: L'Antefatto", y:-230, yl:"c. 230 BBY", r:2024, rl:"2024", t:"manga", e:"alta", img:"equilibrio-in-bilico-antefatto.jpg",
    n:"Manga che apre la serie L'Equilibrio in Bilico, spin-off dell'Alta Repubblica."},
-  {ti:"L'Alta Repubblica – Occhio della Tempesta", y:-230, yl:"230 BBY", r:2022, rl:"2022", t:"fumetto", e:"alta", img:"occhio-tempesta.jpg",
+  {ti:"L'Alta Repubblica – Occhio della Tempesta", y:-230, yl:"230 BBY", r:2022, rl:"2022", t:"fumetto", e:"alta", img:"fine-di-un-jedi.jpg",
    n:"Miniserie in due numeri della Fase I dell'Alta Repubblica."},
   {ti:"L'Alta Repubblica Avventure – Il Terrore Senza Nome", y:-230, yl:"c. 230 BBY", r:2023, rl:"2023", t:"fumetto", e:"alta", img:"terrore-senza-nome.jpg",
    n:"Fumetto con flashback ambientati nel 382 BBY."},
@@ -1537,7 +1537,7 @@ const OPERE = [
    n:"Junior novel di apertura della Fase III: i Jedi indagano in una città perduta minacciata da un antico pericolo."},
   {ti:"L'Alta Repubblica – Il Sentiero dell'Inganno", y:-382, yl:"382 BBY", r:2023, rl:"2023", t:"romanzo", e:"alta", img:"sentiero-inganno.jpg",
    n:"Romanzo che apre la Fase III dell'Alta Repubblica, ambientato 150 anni prima della Fase I."},
-  {ti:"L'Alta Repubblica Avventure – La Missione dei Jedi", y:-382, yl:"382 BBY", r:2023, rl:"2023", t:"fumetto", e:"alta", img:"missione-dei-jedi.jpg",
+  {ti:"L'Alta Repubblica Avventure – La Missione dei Jedi", y:-382, yl:"382 BBY", r:2023, rl:"2023", t:"fumetto", e:"alta", img:"avventure-salvataggio-pirata.jpg",
    n:"One-shot a fumetti con un flashback sull'epoca ancora più antica della Repubblica."},
   {ti:"L'Alta Repubblica – La Lama", y:-382, yl:"382 BBY", r:2023, rl:"2023", t:"fumetto", e:"alta", img:"la-lama.jpg",
    n:"Fumetto della Fase III dell'Alta Repubblica."},
@@ -2085,7 +2085,7 @@ const OPERE = [
    n:"Antologia di one-shot su Finn, Poe Dameron, Rose Tico e Rey nell'epoca della trilogia sequel."},
   {ti:"Poe Dameron Vol. 1 – Squadriglia Nera", y:32, yl:"32 ABY", r:2016, rl:"2016", t:"fumetto", e:"nuova", img:"poe-dameron-1-squadriglia-nera.jpg",
    n:"Primo arco narrativo della serie regolare Poe Dameron, alla ricerca di indizi sul destino di Luke Skywalker prima dell'Episodio VII."},
-  {ti:"La Storia Segreta di Star Wars: C-3PO - L'Arto Fantasma", y:33, yl:"33 ABY", r:2017, rl:"2017", t:"fumetto", e:"nuova", img:"c3po-arto-fantasma.jpg",
+  {ti:"La Storia Segreta di Star Wars: C-3PO - L'Arto Fantasma", y:33, yl:"33 ABY", r:2017, rl:"2017", t:"fumetto", e:"nuova", img:"beckett.jpg",
    n:"One-shot su come C-3PO ha ottenuto il braccio rosso visto ne Il Risveglio della Forza."},
   {ti:"L'Età della Resistenza – Eroi: Finn", y:33, yl:"33 ABY", r:2020, rl:"2020", t:"fumetto", e:"nuova", img:"eta-resistenza-eroi.jpg",
    n:"Antologia di one-shot su Finn, Poe Dameron, Rose Tico e Rey nell'epoca della trilogia sequel."},
@@ -2616,11 +2616,13 @@ const mobileFiltersClose = document.getElementById("mobileFiltersClose");
 const backTop = document.getElementById("backTop");
 const jumpTransition = document.getElementById("jumpTransition");
 const jumpHeaderSnapshot = document.getElementById("jumpHeaderSnapshot");
+const topPanel = document.querySelector(".top-panel");
 let sezioniTimeline = [], segmentiRibbon = [], intestazioniEpoche = [];
 let primaIntestazioneEpoca = null;
 let metricheSezioni = [], metricheTimelineAttese = false;
 let osservatoreDimensioni = null;
 let osservatoreCopertine = null;
+const statoCopertine = new Map();
 let sospendiCaricamentoCopertine = false;
 let ripresaCopertineTimer = null;
 let altezzaBarra = 0;
@@ -2649,38 +2651,54 @@ function preparaCaricamentoCopertine(){
     ripresaCopertineTimer = null;
   }
   osservatoreCopertine?.disconnect();
+  osservatoreCopertine = null;
+  statoCopertine.clear();
   const immagini = [...list.querySelectorAll("img[data-shot][data-src]")];
   if(!immagini.length) return;
   if(!("IntersectionObserver" in window)){
     immagini.forEach(caricaCopertina);
     return;
   }
-  osservatoreCopertine = new IntersectionObserver(entries=>{
+  const osservatore = new IntersectionObserver(entries=>{
+    if(osservatoreCopertine !== osservatore) return;
+    entries.forEach(entry=>statoCopertine.set(entry.target,entry));
     if(sospendiCaricamentoCopertine) return;
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        const visibileOra = entry.boundingClientRect.bottom >= -80
-          && entry.boundingClientRect.top <= innerHeight+80;
-        entry.target.setAttribute("fetchpriority",visibileOra ? "high" : "low");
-        caricaCopertina(entry.target);
-      }else{
-        /* Conserviamo l'indirizzo in data-src, ma liberiamo bitmap e livello
-           grafico delle copertine ormai lontane. Tornando indietro il file
-           viene ripreso dalla cache, senza nuovo peso di rete. */
-        scaricaCopertina(entry.target);
-      }
-    });
+    aggiornaCopertineOsservate(entries);
   },{rootMargin:vistaMobile.matches ? "900px 0px" : "1000px 0px",threshold:.01});
+  osservatoreCopertine = osservatore;
   immagini.forEach(im=>osservatoreCopertine.observe(im));
+}
+function aggiornaCopertineOsservate(entries){
+  for(const entry of entries){
+    if(entry.isIntersecting){
+      const visibileOra = entry.boundingClientRect.bottom >= -80
+        && entry.boundingClientRect.top <= innerHeight+80;
+      entry.target.setAttribute("fetchpriority",visibileOra ? "high" : "low");
+      caricaCopertina(entry.target);
+    }else{
+      /* Conserviamo l'indirizzo in data-src, ma liberiamo bitmap e livello
+         grafico delle copertine ormai lontane. Tornando indietro il file
+         viene ripreso dalla cache, senza nuovo peso di rete. */
+      scaricaCopertina(entry.target);
+    }
+  }
 }
 function programmaRipresaCopertine(){
   if(ripresaCopertineTimer) clearTimeout(ripresaCopertineTimer);
-  /* Le immagini della meta sono gia' state precaricate. Riattivare
-     l'osservatore poco dopo l'arrivo evita che centinaia di registrazioni
-     concorrano con l'ultimo fotogramma della transizione. */
+  /* L'osservatore resta agganciato anche durante il salto e conserva solo
+     l'ultimo stato di ogni immagine. Riprendiamo le stesse richieste dopo
+     l'arrivo, senza ricrearlo e registrare di nuovo l'intera timeline. */
   ripresaCopertineTimer = setTimeout(()=>{
     ripresaCopertineTimer = null;
-    if(!sospendiCaricamentoCopertine) preparaCaricamentoCopertine();
+    if(sospendiCaricamentoCopertine) return;
+    osservatoreCopertine?.takeRecords().forEach(entry=>statoCopertine.set(entry.target,entry));
+    /* Il rettangolo registrato all'ingresso nel margine puo' essere ormai
+       vecchio. Rileggiamo solo le immagini vicine, prima delle scritture,
+       per mantenere la priorita' alta delle copertine visibili all'arrivo. */
+    const stati = [...statoCopertine.values()].map(entry=>entry.isIntersecting
+      ? {target:entry.target,isIntersecting:true,boundingClientRect:entry.target.getBoundingClientRect()}
+      : entry);
+    aggiornaCopertineOsservate(stati);
   },120);
 }
 function precaricaCopertine(root,limite=8,dallaFine=false){
@@ -2695,6 +2713,8 @@ function precaricaCopertine(root,limite=8,dallaFine=false){
 
 function render(){
   osservatoreCopertine?.disconnect();
+  osservatoreCopertine = null;
+  statoCopertine.clear();
   aggiornaPulsantiFiltro();
   const gs = gruppi();
   const tot = gs.reduce((n,g)=>n+g.items.length,0);
@@ -3266,6 +3286,8 @@ function annullaScrollProtetto(){
 function scrollaProtetto(el){
   if(!el) return;
   annullaScrollProtetto();
+  clearTimeout(centraturaRibbonTimer);
+  centraturaRibbonTimer = null;
   ultimoProgressoAnimazione = 0;
   /* L'overlay usa l'ultima altezza gia' calcolata dell'header. Aggiornarla
      una volta all'avvio del salto evita una scrittura di stile per ogni
@@ -3567,15 +3589,31 @@ searchInput.addEventListener("input", e=>{
   deb = setTimeout(()=>{state.q = e.target.value; render()},140);
 });
 let resizeSchedeId = null;
+let larghezzaLayout = innerWidth;
 window.addEventListener("resize", ()=>{
   cancelAnimationFrame(resizeSchedeId);
   resizeSchedeId = requestAnimationFrame(()=>{
-    misuraAltezzeNavigazione();
-    aggiornaRibbon(true);
-    aggiornaIngombriSchede();
-    programmaMetricheTimeline();
-    ultimaEpocaAttiva = "";
-    programmaProgressoEre();
+    resizeSchedeId = null;
+    /* Le barre mobili e la tastiera cambiano l'altezza del viewport, non
+       la larghezza di schede e navigazione. Misurarle tutte in quel caso
+       introduceva lavoro pesante proprio mentre l'utente scorreva. */
+    if(innerWidth !== larghezzaLayout){
+      const cambiaFormato = (larghezzaLayout <= 700) !== vistaMobile.matches;
+      larghezzaLayout = innerWidth;
+      misuraAltezzeNavigazione();
+      aggiornaRibbon(true);
+      aggiornaIngombriSchede();
+      aggiornaTopPanel();
+      if(cambiaFormato) preparaCaricamentoCopertine();
+      programmaMetricheTimeline();
+      ultimaEpocaAttiva = "";
+    }
+    /* L'eventuale guida episodi usa svh: il ResizeObserver delle sezioni
+       rileva gia' un suo cambio d'altezza. La soglia del ritorno in alto
+       dipende invece direttamente dal viewport e va aggiornata sempre. */
+    aggiornaBackTop();
+    if(!osservatoreDimensioni) programmaMetricheTimeline();
+    if(!scrollAnimId) programmaProgressoEre();
   });
 });
 
@@ -3737,16 +3775,21 @@ aggiornaRibbon(true);
    esattamente fino a dove inizia .controls (il suo offsetTop, che per
    un elemento sticky riflette la posizione "normale", non agganciata) */
 function aggiornaTopPanel(){
-  document.documentElement.style.setProperty("--top-panel-h",
-    document.querySelector(".controls").offsetTop+"px");
+  if(!topPanel) return;
+  const altezza = controls.offsetTop+"px";
+  if(topPanel.style.getPropertyValue("--top-panel-h") !== altezza)
+    topPanel.style.setProperty("--top-panel-h",altezza);
 }
-addEventListener("resize", aggiornaTopPanel);
 render();
 aggiornaTopPanel();
 if(document.fonts?.ready){
   document.fonts.ready.then(()=>requestAnimationFrame(()=>{
     misuraAltezzeNavigazione();
     aggiornaRibbon(true);
+    /* Anche le schede vanno misurate con i caratteri definitivi: durante
+       il primo caricamento quelli provvisori possono occupare piu' righe. */
+    aggiornaIngombriSchede();
+    aggiornaTopPanel();
     programmaMetricheTimeline();
   }));
 }
@@ -3977,11 +4020,14 @@ function programmaScrollGenerale(){
   if(scrollGeneraleAtteso) return;
   scrollGeneraleAtteso = true;
   requestAnimationFrame(()=>{
+    scrollGeneraleAtteso = false;
+    /* Un salto puo' iniziare dopo l'accodamento di questo frame. In quel
+       caso gli aggiornamenti sono gia' gestiti dall'animazione protetta. */
+    if(scrollAnimId) return;
     aggiornaRibbon();
     aggiornaProgressoEre();
     aggiornaBackTop();
     aggiornaParallasse();
-    scrollGeneraleAtteso = false;
   });
 }
 addEventListener("scroll",programmaScrollGenerale,{passive:true});
