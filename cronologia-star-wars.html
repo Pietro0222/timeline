@@ -1373,6 +1373,114 @@ html.scroll-protetto,html.scroll-protetto body{touch-action:none}
 }
 </style>
 <style id="to-menu-css">.masthead{position:relative}.to-menu{position:absolute;right:0;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid rgba(226,234,244,.22);border-radius:6px;background:rgba(9,14,24,.6);color:#E2EAF4;font:700 14px/1 "Saira Condensed","Arial Narrow",sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:border-color .2s,background-color .2s}.to-menu:hover{border-color:rgba(226,234,244,.55);background:rgba(20,30,48,.8)}.to-menu:focus-visible{outline:2px solid #E2EAF4;outline-offset:3px}@media (max-width:640px){.to-menu{padding:7px 10px;font-size:12.5px}}</style>
+<style id="perf-simboli">
+/* Il riquadro del simbolo continua a cambiare misura come prima (stessa
+   impaginazione); il disegno colorato invece resta alla misura piena e
+   viene ridotto con una trasformazione, che non richiede di ridisegnare
+   la maschera a ogni fotogramma. */
+.ribbon{--sig-m:46px;--sig-r:.434783}
+@media (min-width:761px){.ribbon{--sig-m:39px;--sig-r:.435897}}
+@media (max-width:760px){.ribbon{--sig-m:43.7px;--sig-r:.434783}}
+@media (max-width:700px){.ribbon{--sig-m:43.7px;--sig-r:.491304}}
+.sigillo{position:relative}
+.sigillo:not(.vuoto):not(.naturale){background:none;-webkit-mask:none;mask:none}
+.sigillo:not(.vuoto):not(.naturale)::before{content:"";position:absolute;
+  left:50%;top:50%;width:var(--sig-m);height:var(--sig-m);
+  margin:calc(var(--sig-m)/-2) 0 0 calc(var(--sig-m)/-2);
+  background-color:var(--c);
+  -webkit-mask:var(--sig) center/contain no-repeat;
+          mask:var(--sig) center/contain no-repeat;
+  transform:scale(calc(1 - var(--sig-r)*var(--p,0)));
+  will-change:transform;pointer-events:none}
+</style>
+<style id="salto-computer">
+/* Copertura dei salti lunghi anche su computer: stessa tecnica del telefono,
+   ma con la linea al centro e le sagome delle schede ai due lati. */
+@keyframes rushGiu{0%{transform:translate3d(0,0,0)}18%{transform:translate3d(0,-8px,0)}40%{transform:translate3d(0,-58px,0)}55%{transform:translate3d(0,-83px,0)}70%{transform:translate3d(0,-100px,0)}82%{transform:translate3d(0,-109px,0)}92%{transform:translate3d(0,-113px,0)}100%{transform:translate3d(0,-116px,0)}}
+@keyframes rushSu{0%{transform:translate3d(0,0,0)}18%{transform:translate3d(0,8px,0)}40%{transform:translate3d(0,58px,0)}55%{transform:translate3d(0,83px,0)}70%{transform:translate3d(0,100px,0)}82%{transform:translate3d(0,109px,0)}92%{transform:translate3d(0,113px,0)}100%{transform:translate3d(0,116px,0)}}
+@media (min-width:701px){
+  .jump-transition{
+    display:block;position:fixed;z-index:25;overflow:hidden;
+    top:var(--bar-h,0px);right:0;bottom:0;left:0;
+    opacity:0;visibility:hidden;pointer-events:none;contain:strict;isolation:isolate;
+    background-image:
+      radial-gradient(circle at 23px 31px,rgba(242,247,255,.34) 0 .65px,transparent .95px),
+      radial-gradient(circle at 91px 137px,rgba(193,216,250,.24) 0 .7px,transparent 1px),
+      radial-gradient(circle at 211px 83px,rgba(255,237,207,.19) 0 .75px,transparent 1.1px),
+      linear-gradient(90deg,#020409 0,#050910 22%,#060B13 50%,#050910 78%,#020409 100%);
+    background-size:173px 211px,257px 331px,389px 487px,auto;
+    background-position:0 0,37px 59px,83px 127px,0 0;
+    background-repeat:repeat,repeat,repeat,no-repeat;
+    transition:opacity .22s ease,visibility 0s linear .22s
+  }
+  .jump-transition::before{
+    content:"";position:absolute;top:-116px;bottom:-116px;
+    left:calc(50% - 10px);width:20px;opacity:0;
+    background:
+      radial-gradient(circle,rgba(151,169,190,.68) 0 2.5px,
+        rgba(119,139,161,.28) 3.5px,transparent 5.5px) center 18px/20px 116px repeat-y,
+      linear-gradient(to right,transparent 9px,rgba(133,153,176,.32) 9px 11px,
+        transparent 11px) center/20px 100% no-repeat;
+    filter:blur(.35px);transform:translate3d(0,0,0);transition:opacity .11s ease
+  }
+  .jump-transition::after{
+    content:"";position:absolute;top:-116px;bottom:-116px;
+    left:calc(50% - min(480px,50vw - 20px));right:calc(50% - min(480px,50vw - 20px));
+    opacity:0;
+    --scheda:linear-gradient(to bottom,transparent 0 13px,rgba(81,111,146,.05) 14px 23px,
+      rgba(107,137,171,.12) 24px 74px,rgba(147,177,211,.22) 75px 76px,
+      rgba(24,39,58,.08) 77px 84px,transparent 85px 232px);
+    background:var(--scheda) 0 0/calc(50% - 46px) 232px repeat-y,
+               var(--scheda) 100% 116px/calc(50% - 46px) 232px repeat-y;
+    filter:blur(2.2px);transform:translate3d(0,0,0);transition:opacity .11s ease
+  }
+  .jump-transition.is-visible{opacity:1;visibility:visible;pointer-events:auto;
+    transition:opacity .22s ease,visibility 0s}
+  .jump-transition.is-visible::before{opacity:.64;animation:rushGiu .72s linear both}
+  .jump-transition.is-visible::after{opacity:.9;animation:rushGiu .72s linear both}
+  .jump-transition.is-visible.verso-alto::before,
+  .jump-transition.is-visible.verso-alto::after{animation-name:rushSu}
+  .jump-line-fade{display:block;position:absolute;z-index:1;top:0;bottom:0;
+    left:calc(50% - 13px);width:26px;pointer-events:none}
+  .jump-line-fade::before,.jump-line-fade::after{content:"";position:absolute;left:0;width:100%;height:min(18vh,120px)}
+  .jump-line-fade::before{top:0;background:linear-gradient(to bottom,#060B13 0%,rgba(6,11,19,.94) 24%,transparent 100%)}
+  .jump-line-fade::after{bottom:0;background:linear-gradient(to top,#060B13 0%,rgba(6,11,19,.94) 24%,transparent 100%)}
+  .jump-transition.is-exiting{opacity:0;pointer-events:none;
+    transition:opacity .26s cubic-bezier(.22,.72,.24,1),visibility 0s linear .26s}
+}
+</style>
+<style id="menu-sopra">
+/* tasto Menu sopra il titolo, non piu' a destra */
+.to-menu{position:static;transform:none;margin:0 0 14px}
+@media (max-width:640px){.to-menu{margin-bottom:12px}}
+</style>
+<style id="spazio-era">
+/* la prima scheda di ogni era comincia dopo la sfumatura nera del titolo (55 px) */
+.items{padding-top:62px}
+</style>
+<style id="leggera">
+/* prova 4: niente sfocatura ricalcolata dietro le schede (pannello un po' piu'
+   scuro al suo posto) e nebulose di sfondo disegnate una volta sola */
+.head{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(9,14,24,.82)}
+#sky .neb{mix-blend-mode:normal;will-change:transform}
+#sky .banda,#sky .polvere,#sky .buio{will-change:transform}
+</style>
+<style id="salto-pulito">
+html.in-salto .group:not(.meta-salto) .group-head{visibility:hidden}
+.group,.group-head{contain:none}
+.group-head{will-change:auto;transform:none}
+.group-head::before{bottom:auto;height:calc(100% + 55px)}
+/* su computer la velatura e' una dissolvenza scura, senza stelline proprie */
+@media (min-width:701px){
+  .jump-transition{background-image:linear-gradient(90deg,#020409 0,#050910 22%,#060B13 50%,#050910 78%,#020409 100%)!important;
+    background-size:auto!important;background-position:0 0!important;background-repeat:no-repeat!important}
+}
+</style>
+<style id="velatura-sotto-linea">
+/* la velatura parte 2 px sopra la linea dell'intestazione (che le resta sopra):
+   nessuna fessura da cui si vedano i riquadri */
+.jump-transition{top:calc(var(--bar-h,0px) - 2px)!important}
+</style>
 </head>
 <body>
 
@@ -2869,7 +2977,7 @@ function voce(o, lato){
     : `${fumettoAperto?"Chiudi":"Apri"} i numeri contenuti in ${o.ti}`;
   const meta = [tipoLab, o.rl].concat(o.lg?["Legends"]:[]);
   const mostraImg = COPERTINE_ATTIVE && o.img;
-  const src = mostraImg ? `<img data-shot data-src="immagini/${esc(o.img)}?v=${CACHE_BUST}" alt="" draggable="false" loading="eager" decoding="async">` : "";
+  const src = mostraImg ? `<img data-shot data-src="${tipo==="film"||tipo==="gioco"?"immagini":"immagini-ridotte"}/${esc(o.img)}?v=${CACHE_BUST}" alt="" draggable="false" loading="eager" decoding="async">` : "";
   return `<li class="item ${lato} ${o.lg?"legends":""} ${schedeIngrandite.has(o.id)?"mobile-ingrandita":""} ${haGuidaEpisodi?"has-episode-guide":""} ${guidaAperta?"episode-guide-open":""} ${haGuidaFumetto?"has-comic-guide":""} ${fumettoAperto?"comic-guide-open":""}" id="opera-${o.id}" data-opera-tipo="${esc(tipo)}">
     <${tagTesta} class="head"${interattiva?` type="button" aria-expanded="${String(guidaAperta || fumettoAperto)}" aria-controls="${idPannello}" aria-label="${esc(ariaLabel)}"`:""}>
       <figure class="shot${mostraImg?"":" vuoto"}" data-tipo="${esc(tipoLab)}">${src}</figure>
@@ -2949,11 +3057,16 @@ function aggiornaIngombriSchede(){
    layout (filtri, ricerca, apertura di una scheda o ridimensionamento),
    non durante il normale scroll. Tenerle in memoria evita letture di
    layout sincrone a ogni fotogramma, particolarmente costose nei webview. */
+function spostamentoLista(){
+  if(!window.__nastroSD) return 0;
+  const t = getComputedStyle(list).transform;
+  return t && t !== "none" ? new DOMMatrix(t).m42 : 0;
+}
 function misuraSezioniTimeline(){
   const paginaY = scrollY;
   metricheSezioni = sezioniTimeline.map(sezione=>{
     const r = sezione.getBoundingClientRect();
-    return {top:r.top+paginaY,height:r.height};
+    return {top:r.top+paginaY-spostamentoLista(),height:r.height};
   });
 }
 function programmaMetricheTimeline(){
@@ -3218,7 +3331,14 @@ function nascondiHeaderDuranteSalto(sincronizza=false){
   jumpHeaderSnapshot.replaceChildren();
   jumpHeaderSnapshot.style.removeProperty("height");
 }
+/* prova 7: durante un salto i titoli delle ere attraversate non compaiono;
+   resta visibile solo quello dell'era di arrivo */
+function fineSaltoTitoli(){
+  document.documentElement.classList.remove("in-salto");
+  document.querySelectorAll(".group.meta-salto").forEach(g=>g.classList.remove("meta-salto"));
+}
 function terminaScrollProtetto(){
+  fineSaltoTitoli();
   scrollAnimId = null;
   sospendiProgressoEre = false;
   const riprendiCopertine = sospendiCaricamentoCopertine;
@@ -3271,6 +3391,7 @@ function animaTrattoScroll(startY,targetY,durata,
   scrollAnimId = requestAnimationFrame(passo);
 }
 function annullaScrollProtetto(){
+  fineSaltoTitoli();
   if(scrollAnimId && scrollAnimId !== -1) cancelAnimationFrame(scrollAnimId);
   scrollAnimId = null;
   if(scrollSaltoTimer){
@@ -3298,9 +3419,15 @@ function scrollaProtetto(el){
 
   const startY = scrollY;
   const maxY = Math.max(0,document.documentElement.scrollHeight-innerHeight);
-  const targetY = Math.max(0,Math.min(maxY,el.getBoundingClientRect().top + scrollY));
+  const targetY = Math.max(0,Math.min(maxY,el.getBoundingClientRect().top + scrollY - (list.contains(el) ? spostamentoLista() : 0)));
   const distanza = targetY - startY;
   if(Math.abs(distanza) < 2) return;
+  if(el.classList && el.classList.contains("group")) el.classList.add("meta-salto");
+  else { const primo = list.querySelector(".group"); if(primo) primo.classList.add("meta-salto"); }
+  const altezzaVista = innerHeight;
+  sezioniTimeline.forEach(g=>{ const r = g.getBoundingClientRect();
+    if(r.bottom > 0 && r.top < altezzaVista) g.classList.add("meta-salto"); });
+  document.documentElement.classList.add("in-salto");
   sospendiProgressoEre = true;
   sospendiCaricamentoCopertine = true;
 
@@ -3327,7 +3454,7 @@ function scrollaProtetto(el){
   };
 
   const movimentoRidotto = matchMedia("(prefers-reduced-motion:reduce)").matches;
-  const saltoMobileLungo = vistaMobile.matches && !movimentoRidotto
+  const saltoMobileLungo = !movimentoRidotto
     && Math.abs(distanza) > Math.max(2200,innerHeight*3);
 
   if(!saltoMobileLungo){
@@ -3664,6 +3791,13 @@ function misuraAltezzeNavigazione(){
   controlliMisura.style.position = "static";
   controlliMisura.style.top = "auto";
   metro.append(nastroMisura,controlliMisura);
+  const testaMisura = primaIntestazioneEpoca ? primaIntestazioneEpoca.cloneNode(true) : null;
+  if(testaMisura){
+    testaMisura.style.position = "static";
+    testaMisura.style.top = "auto";
+    testaMisura.style.margin = "0";
+    metro.append(testaMisura);
+  }
   document.body.append(metro);
 
   const nuoviCampioni = [];
@@ -3672,15 +3806,67 @@ function misuraAltezzeNavigazione(){
     nastroMisura.style.setProperty("--p",valore);
     nastroMisura.style.setProperty("--scroll-header-p",valore);
     controlliMisura.style.setProperty("--scroll-header-p",valore);
+    if(testaMisura) testaMisura.style.setProperty("--scroll-header-p",vistaMobile.matches ? valore : "0");
     nuoviCampioni.push({
       nastro:nastroMisura.offsetHeight,
-      controlli:controlliMisura.offsetHeight
+      controlli:controlliMisura.offsetHeight,
+      fondo:controlliMisura.offsetTop+controlliMisura.offsetHeight,
+      testa:testaMisura ? testaMisura.offsetHeight : 0
     });
   }
   metro.remove();
   campioniAltezzeHeader = nuoviCampioni;
   ultimoIngombroHeader = "";
   aggiornaIngombroHeader(progressoHeaderCorrente,true);
+  sbloccaLista();
+  aggiornaCongelamento(progressoHeaderCorrente);
+}
+
+/* Durante il rimpicciolimento del nastro (e, su telefono, della barra e
+   della prima intestazione) la timeline sotto non viene reimpaginata:
+   resta ferma nel documento e viene fatta salire con uno spostamento
+   grafico identico, applicato dalla scheda video. Cosi' a ogni fotogramma
+   si ridisegna solo l'intestazione, non tutte le schede visibili. Appena
+   il nastro e' compatto l'impaginazione torna normale in un colpo solo,
+   senza differenze visibili. */
+let listaCongelata = false, baseLista = 0, testaCongelata = null, baseTesta = 0;
+function sbloccaLista(){
+  listaCongelata = false;
+  list.style.removeProperty("margin-top");
+  list.style.removeProperty("translate");
+  list.style.removeProperty("will-change");
+  if(testaCongelata){
+    testaCongelata.style.removeProperty("margin-bottom");
+    testaCongelata.style.removeProperty("translate");
+    testaCongelata = null;
+  }
+}
+function aggiornaCongelamento(p){
+  if(window.__nastroSD){ if(listaCongelata) sbloccaLista(); return; }
+  if(!campioniAltezzeHeader.length || !intestazioniEpoche.length){ if(listaCongelata) sbloccaLista(); return; }
+  if(p >= 1){ if(listaCongelata) sbloccaLista(); return; }
+  const testa = primaIntestazioneEpoca;
+  if(!listaCongelata || testa !== testaCongelata){
+    sbloccaLista();
+    const fondo0 = controls.getBoundingClientRect().bottom + scrollY;
+    baseLista = fondo0 + (campioniAltezzeHeader[0].fondo - interpolaCampioniHeader("fondo",p));
+    if(testa){
+      baseTesta = testa.getBoundingClientRect().height + (vistaMobile.matches
+        ? campioniAltezzeHeader[0].testa - interpolaCampioniHeader("testa",p) : 0);
+      testaCongelata = testa;
+    }
+    list.style.willChange = "translate";
+    listaCongelata = true;
+  }
+  /* fondo reale dei comandi e altezza reale della prima intestazione */
+  const d = baseLista - (controls.getBoundingClientRect().bottom + scrollY);
+  const dt = testa ? Math.max(0, baseTesta - testa.getBoundingClientRect().height) : 0;
+  list.style.marginTop = d+"px";
+  list.style.translate = "0 "+(-(d+dt))+"px";
+  if(testa){
+    testa.style.marginBottom = dt+"px";
+    testa.style.translate = "0 "+dt+"px";
+  }
 }
 
 function interpolaCampioniHeader(proprieta,p){
@@ -3752,12 +3938,40 @@ function applicaProgressoHeader(pTesto,shieldPTesto){
       primaIntestazioneEpoca.style.setProperty("--scroll-header-p",pTesto);
   }
   aggiornaIngombroHeader(progressoHeaderCorrente);
+  aggiornaCongelamento(progressoHeaderCorrente);
 }
 
+let pMostrato = null, pRincorsa = null, tRincorsa = 0, inRincorsa = false;
 function aggiornaRibbon(forza=false){
+  if(window.__nastroSD){
+    /* nastro reale sempre compatto: la parte grande e' una copia animata dallo scroll */
+    const sP = Math.min(1, Math.max(0, window.scrollY/54)).toFixed(4);
+    if(!forza && ultimoRibbonP === "1.0000" && sP === ultimoShieldP) return;
+    ultimoRibbonP = "1.0000"; ultimoShieldP = sP;
+    applicaProgressoHeader("1.0000", sP);
+    return;
+  }
   /* Dipende soltanto dallo scroll e dalla corsa misurata fuori dal ciclo:
      nessuna lettura di layout dell'elemento sticky durante l'animazione. */
-  const p = Math.min(1,Math.max(0,window.scrollY/corsaHeader));
+  const pReale = Math.min(1,Math.max(0,window.scrollY/corsaHeader));
+  /* prova 6: con uno scorrimento veloce la misura dei tasti non salta ai
+     nuovi valori, ma li raggiunge in pochi fotogrammi (circa 0,1 s).
+     Scorrendo piano (meno di ~5 px per fotogramma) segue lo scroll come prima. */
+  let p = pReale;
+  const adesso = performance.now();
+  if(!forza && !scrollAnimId && pMostrato !== null){
+    const diff = pReale - pMostrato;
+    if(Math.abs(diff) > .035){
+      /* avvicinamento legato al tempo, non ai fotogrammi: ~95% in 0,13 s */
+      /* primo passo di una rincorsa: come un fotogramma normale; poi conta
+         il tempo reale trascorso, qualunque sia la frequenza dei fotogrammi */
+      const dt = inRincorsa ? Math.min(250, Math.max(0, adesso - tRincorsa)) : 16.7;
+      p = pMostrato + diff*(1 - Math.exp(-dt/45));
+      inRincorsa = true;
+      if(!pRincorsa) pRincorsa = requestAnimationFrame(()=>{ pRincorsa = null; aggiornaRibbon(); });
+    } else inRincorsa = false;
+  } else inRincorsa = false;
+  pMostrato = p; tRincorsa = adesso;
   /* La barra trasparente di Telegram altera la posizione percepita del
      viewport: la schermatura dipende quindi dallo scroll reale, non dalla
      posizione sticky del nastro. Dopo pochi pixel diventa del tutto opaca. */
@@ -3778,7 +3992,7 @@ aggiornaRibbon(true);
    un elemento sticky riflette la posizione "normale", non agganciata) */
 function aggiornaTopPanel(){
   if(!topPanel) return;
-  const altezza = controls.offsetTop+"px";
+  const altezza = (controls.offsetTop + (window.__nastroSD ? window.__nastroDelta : 0))+"px";
   if(topPanel.style.getPropertyValue("--top-panel-h") !== altezza)
     topPanel.style.setProperty("--top-panel-h",altezza);
 }
@@ -4041,6 +4255,144 @@ if(location.hash.startsWith("#opera-")){
     setTimeout(()=>document.getElementById("opera-"+id)?.scrollIntoView({block:"center"}),80);
   }
 }
+</script>
+<script>
+/* prova 5: le stelle in parallasse seguono lo scorrimento direttamente,
+   gestite dalla scheda video (scroll-driven animations). Stesso movimento
+   del codice originale: spostamento = scorrimento x profondita', modulo 820 px.
+   Se il browser non lo supporta resta la parallasse originale. */
+(function(){
+  if(!(window.CSS && CSS.supports("animation-timeline: scroll()"))) return;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const strati=[...document.querySelectorAll("#stelle .layer")];
+  if(!strati.length) return;
+  const st=document.createElement("style");
+  st.textContent="@keyframes stelleCiclo{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-820px,0)}}"
+    +"#stelle .layer{animation:stelleCiclo 1s linear both;animation-timeline:scroll(root block)}";
+  document.head.append(st);
+  const aggiorna=()=>{
+    const max=Math.max(1,document.documentElement.scrollHeight-document.documentElement.clientHeight);
+    strati.forEach(el=>el.style.animationIterationCount=(max*Number(el.dataset.depth)/820).toFixed(5));
+  };
+  aggiorna();
+  addEventListener("resize",aggiorna);
+  if("ResizeObserver" in window) new ResizeObserver(aggiorna).observe(document.body);
+  aggiornaParallasse = ()=>{};
+})();
+</script>
+<script>
+/* prova 10: restringimento del nastro su computer con scroll-driven animations.
+   Il nastro reale e' sempre compatto; sopra c'e' una copia grande. Mentre si
+   scorre fino all'aggancio del nastro, la copia si restringe e sfuma nel nastro
+   compatto, e barra di ricerca e schede salgono della differenza: tutto con
+   trasformazioni e dissolvenze legate allo scroll, senza ridisegnare i tasti. */
+(function(){
+  const supporta = window.CSS && CSS.supports("animation-timeline: scroll()") && CSS.supports("animation-range: 0px 100px");
+  const computer = matchMedia("(min-width:701px)");
+  if(!supporta || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const wrap = document.querySelector(".wrap");
+  let copia = null; const stile = document.createElement("style"); document.head.append(stile);
+  function smonta(){
+    if(copia){ copia.remove(); copia = null; }
+    stile.textContent = ""; window.__nastroSD = false; window.__nastroDelta = 0;
+  }
+  function monta(){
+    smonta();
+    if(!computer.matches || !campioniAltezzeHeader.length) { aggiornaRibbon(true); aggiornaTopPanel(); return; }
+    const grande = campioniAltezzeHeader[0].nastro, piccolo = campioniAltezzeHeader[PASSI_MISURA_HEADER].nastro;
+    if(!(grande > piccolo)) return;
+    const delta = grande - piccolo, corsa = corsaHeader;
+    window.__nastroSD = true; window.__nastroDelta = delta;
+    aggiornaRibbon(true);
+    copia = ribbonNav.cloneNode(true);
+    copia.removeAttribute("id"); copia.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+    copia.classList.add("nastro-grande"); copia.setAttribute("aria-hidden","true");
+    copia.style.setProperty("--p","0"); copia.style.setProperty("--mobile-shield-p","0");
+    const track = copia.querySelector(".ribbon-track"); if(track) track.removeAttribute("id");
+    copia.querySelectorAll(".seg").forEach(b=>b.setAttribute("tabindex","-1"));
+    Object.assign(copia.style,{position:"absolute",top:ribbonNav.offsetTop+"px",left:ribbonNav.offsetLeft+"px",
+      width:ribbonNav.offsetWidth+"px",margin:"0"});
+    wrap.insertBefore(copia, ribbonNav.nextSibling);
+    /* misure reali: riquadro dei tasti e simbolo, grande (copia) e compatto (reale) */
+    const segG = copia.querySelector(".seg").getBoundingClientRect(), segP = ribbonNav.querySelector(".seg").getBoundingClientRect();
+    const sigG = copia.querySelector(".sigillo").getBoundingClientRect(), sigP = ribbonNav.querySelector(".sigillo").getBoundingClientRect();
+    const kN = piccolo/grande, kS = segP.height/segG.height, kU = (sigP.width||1)/(sigG.width||1);
+    const passi = 12, fr = [];
+    const kf = (nome, f)=>{ let t=""; for(let i=0;i<=passi;i++){ const x=i/passi; t+=`${(x*100).toFixed(2)}%{${f(x)}}`; } return `@keyframes ${nome}{${t}}`; };
+    const sy = x=>1-(1-kS)*x, su = x=>1-(1-kU)*x;
+    const anim = n=>`animation:${n} linear both;animation-timeline:scroll(root block);animation-range:0px ${corsa}px`;
+    stile.textContent = [
+      /* sfondo scuro del nastro grande: si accorcia */
+      kf("ngSfondo", x=>`transform:scaleY(${1-(1-kN)*x})`),
+      /* riquadri dei tasti: si accorciano dall'alto */
+      kf("ngTasto", x=>`transform:scaleY(${sy(x)})`),
+      /* simboli: si rimpiccioliscono senza deformarsi (compensano l'accorciamento) */
+      kf("ngSimbolo", x=>`transform:scale(${su(x)},${su(x)/sy(x)})`),
+      /* scritte e linea: sfumano come nell'originale, senza deformarsi */
+      kf("ngScritte", x=>`transform:scaleY(${1/sy(x)});opacity:${Math.max(0,1-2.2*x)}`),
+      kf("ngLinea", x=>`transform:scaleY(${1/sy(x)});opacity:${(.55*(1-x)).toFixed(3)}`),
+      /* la copia sparisce solo alla fine, quando le misure coincidono */
+      `@keyframes ngCopia{0%{opacity:1;visibility:visible}85%{opacity:1}99.9%{visibility:visible}100%{opacity:0;visibility:hidden}}`,
+      `@keyframes npEntra{0%{opacity:0}85%{opacity:0}100%{opacity:1}}`,
+      `@keyframes contenutiSalgono{from{transform:translate3d(0,${delta}px,0)}to{transform:translate3d(0,0,0)}}`,
+      `.ribbon.nastro-grande{z-index:33;will-change:opacity;${anim("ngCopia")}}`,
+      `.ribbon.nastro-grande::before{transform-origin:50% 12px;will-change:transform;${anim("ngSfondo")}}`,
+      `.ribbon.nastro-grande .seg{transform-origin:50% 0;will-change:transform;transition:none;${anim("ngTasto")}}`,
+      `.ribbon.nastro-grande .seg .sigillo{will-change:transform;${anim("ngSimbolo")}}`,
+      `.ribbon.nastro-grande .seg .dati{will-change:transform,opacity;${anim("ngScritte")}}`,
+      `.ribbon.nastro-grande .seg i{will-change:transform,opacity;${anim("ngLinea")}}`,
+      `nav.ribbon:not(.nastro-grande){${anim("npEntra")}}`,
+      `#controls,#list{${anim("contenutiSalgono")}}`,
+      `#list{will-change:transform}`
+    ].join("\n");
+    collegaCopia();
+    aggiornaTopPanel();
+    programmaMetricheTimeline();
+  }
+  /* prova 12: la copia grande segue sempre il nastro vero: scorrimento
+     laterale, era evidenziata, ere completate e barra di avanzamento */
+  let osservatore = null, trackAscoltato = null, inAllineamento = false;
+  /* scorrimento laterale in entrambe le direzioni: in cima si tocca la copia */
+  function daCopia(e){
+    if(inAllineamento){ inAllineamento = false; return; }
+    const tv = trackVero(); if(!tv) return;
+    if(Math.abs(tv.scrollLeft - e.currentTarget.scrollLeft) > .5) tv.scrollLeft = e.currentTarget.scrollLeft;
+  }
+  const trackVero = ()=>document.getElementById("ribbon");
+  function allinea(){
+    if(!copia) return;
+    const tv = trackVero(), tc = copia.querySelector(".ribbon-track");
+    if(tv && tc && Math.abs(tc.scrollLeft - tv.scrollLeft) > .5){ inAllineamento = true; tc.scrollLeft = tv.scrollLeft; }
+    const sv = ribbonNav.querySelectorAll(".seg"), sc = copia.querySelectorAll(".seg");
+    if(sv.length !== sc.length){ requestAnimationFrame(monta); return; }
+    sv.forEach((v,i)=>{
+      const c = sc[i];
+      if(c.className !== v.className) c.className = v.className;
+      const ac = v.getAttribute("aria-current");
+      if(c.getAttribute("aria-current") !== ac){ if(ac === null) c.removeAttribute("aria-current"); else c.setAttribute("aria-current", ac); }
+      const pr = v.style.getPropertyValue("--epoca-progress");
+      if(c.style.getPropertyValue("--epoca-progress") !== pr) c.style.setProperty("--epoca-progress", pr);
+    });
+  }
+  function collegaCopia(){
+    if(osservatore) osservatore.disconnect();
+    const tv = trackVero(); if(!tv || !copia) return;
+    if(trackAscoltato !== tv){ tv.addEventListener("scroll", allinea, {passive:true}); trackAscoltato = tv; }
+    const tc = copia.querySelector(".ribbon-track");
+    if(tc) tc.addEventListener("scroll", daCopia, {passive:true});
+    osservatore = new MutationObserver(muta=>{
+      if(muta.some(m=>m.type==="childList")) requestAnimationFrame(monta); else allinea();
+    });
+    osservatore.observe(tv, {childList:true, subtree:true, attributes:true, attributeFilter:["class","aria-current","style"]});
+    allinea();
+  }
+  /* la copia segue anche il progresso delle ere e i simboli del nastro reale */
+  const misuraOriginale = misuraAltezzeNavigazione;
+  misuraAltezzeNavigazione = function(){ const r = misuraOriginale.apply(this, arguments); requestAnimationFrame(monta); return r; };
+  computer.addEventListener("change", monta);
+  addEventListener("resize", ()=>requestAnimationFrame(monta));
+  monta();
+})();
 </script>
 <!-- Cloudflare Web Analytics -->
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "622c8edc4b314623a9588081a9192323"}'></script>
