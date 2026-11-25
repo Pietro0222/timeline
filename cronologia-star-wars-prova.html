@@ -1492,14 +1492,6 @@ html.in-salto .group:not(.meta-salto) .group-head{visibility:hidden}
 .jump-transition{top:calc(var(--bar-h,0px) - 2px)!important}
 </style>
 <style id="linea-dietro">@media (min-width:701px){html .items .item:is(.film,.serie,.corto,.gioco) .head{background-color:var(--bg,#03050B)}}</style>
-<style id="espansione-fluida">
-/* PC: l'altezza del pannello si imposta subito (un solo calcolo della pagina);
-   l'apertura si vede con animazioni gestite dalla scheda grafica (vedi script). */
-@media (min-width:701px){
-  html.espansione-fluida .episode-guide{transition:opacity .24s ease,transform .38s cubic-bezier(.22,.8,.25,1)}
-  html.espansione-fluida .comic-guide{transition:opacity .22s ease,transform .34s cubic-bezier(.22,.8,.25,1)}
-}
-</style>
 </head>
 <body>
 
@@ -4421,126 +4413,44 @@ if(location.hash.startsWith("#opera-")){
 <!-- Cloudflare Web Analytics -->
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "622c8edc4b314623a9588081a9192323"}'></script>
 <!-- End Cloudflare Web Analytics -->
-<script id="espansione-fluida-js">
-/* Apertura/chiusura dei pannelli (episodi, numeri dei fumetti) su PC.
-   Prima l'altezza del pannello animata ricalcolava tutta la timeline a ogni
-   fotogramma. Ora la pagina viene calcolata una volta sola e l'effetto
-   (pannello che si svela dall'alto, schede sotto che scendono) e' fatto con
-   spostamenti e ritagli, che non richiedono di ricalcolare la pagina. */
+<script id="espansione-leggera">
+/* Apertura/chiusura dei pannelli (episodi, numeri dei fumetti): l'animazione
+   resta quella originale, ma per la sua durata le epoche lontane dallo schermo
+   vengono "congelate" (il browser non le ricalcola a ogni fotogramma).
+   Mantengono esattamente la loro altezza, quindi la pagina non si sposta. */
 (()=>{
-  if(matchMedia("(prefers-reduced-motion:reduce)").matches || !Element.prototype.animate) return;
-  const PC = matchMedia("(min-width:701px)");
-  const CURVA = "cubic-bezier(.22,.8,.25,1)";
-  document.documentElement.classList.add("espansione-fluida");
-  const inCorso = new WeakMap();
-
-  function seguenti(scheda){
-    const out = [], limite = innerHeight * 1.6;
-    const fisso = el => getComputedStyle(el).position === "fixed";
-    let el = scheda.nextElementSibling;
-    for(; el; el = el.nextElementSibling){ if(fisso(el)) continue; if(el.getBoundingClientRect().top > limite) return out; out.push(el); }
-    /* le epoche successive sono lunghissime: non si spostano intere (la scheda
-       grafica dovrebbe ridisegnarle tutte, ci vogliono secondi), ma solo i loro
-       pezzi visibili: titolo e prime schede */
-    let g = scheda.closest(".group");
-    for(g = g && g.nextElementSibling; g; g = g.nextElementSibling){
-      if(g.getBoundingClientRect().top > limite) break;
-      if(!g.classList.contains("group")){ if(!fisso(g)) out.push(g); continue; }
-      for(const figlio of g.children){
-        if(figlio.getBoundingClientRect().top > limite) break;
-        if(!figlio.matches(".items")){ if(!fisso(figlio)) out.push(figlio); continue; }
-        for(const it of figlio.children){
-          if(it.getBoundingClientRect().top > limite) break;
-          out.push(it);
-        }
-      }
-    }
-    return out;
+  if(!("contentVisibility" in document.documentElement.style)) return;
+  const congelate = new Set();
+  let timer = 0;
+  function congela(){
+    const margine = innerHeight * 1.5;
+    document.querySelectorAll("#list > .group").forEach(g=>{
+      if(congelate.has(g)) return;
+      const r = g.getBoundingClientRect();
+      if(r.bottom > -margine && r.top < innerHeight + margine) return;
+      g.style.containIntrinsicSize = `auto ${r.width}px auto ${r.height}px`;
+      g.style.contentVisibility = "auto";
+      congelate.add(g);
+    });
   }
-  function chiudiAnimazioni(scheda){
-    const a = inCorso.get(scheda); if(!a) return;
-    inCorso.delete(scheda); a.fine && a.fine(); a.lista.forEach(x=>x.cancel());
+  function scongela(){
+    const lista = [...congelate]; congelate.clear();
+    const via = ()=>lista.forEach(g=>{ g.style.removeProperty("content-visibility"); g.style.removeProperty("contain-intrinsic-size"); });
+    (window.requestIdleCallback || setTimeout)(via, {timeout:1500});
   }
-  function avvolgi(nome, selPannello, durata){
+  function avvolgi(nome){
     const originale = window[nome];
     if(typeof originale !== "function") return;
-    window[nome] = function(scheda, apri){
-      if(!PC.matches || !scheda) return originale.apply(this, arguments);
-      const pannello = scheda.querySelector(":scope > " + selPannello);
-      const classe = nome === "impostaGuidaEpisodi" ? "episode-guide-open" : "comic-guide-open";
-      chiudiAnimazioni(scheda);
-      const aperto = scheda.classList.contains(classe);
-      if(!pannello || apri === aperto) return originale.apply(this, arguments);
-      const opz = {duration: durata, easing: CURVA};
-      if(apri){
-        /* apertura come la chiusura: la pagina si ricalcola solo alla fine.
-           Durante l'animazione il pannello resta "sospeso" sopra le schede
-           (non occupa spazio) e le schede sotto scendono con uno spostamento. */
-        const altri = seguenti(scheda);
-        const st = pannello.style;
-        const sospendi = ()=>{ st.position="absolute"; st.left=pannello.offsetLeft+"px"; st.top=pannello.offsetTop+"px"; st.width=pannello.offsetWidth+"px"; st.zIndex="1"; };
-        const libera = ()=>{ ["position","left","top","width","z-index"].forEach(k=>st.removeProperty(k)); };
-        /* posizione delle schede sotto: prima, durante (pannello sospeso) e dopo.
-           Aprire una scheda puo' cambiare anche il margine della scheda seguente
-           (schede sfalsate), quindi si misura tutto invece di stimarlo. */
-        const yPrima = altri.length ? altri[0].getBoundingClientRect().top : 0;
-        sospendi();
-        const r = originale.apply(this, arguments);
-        let da = 0, a = pannello.getBoundingClientRect().height;
-        if(altri.length){
-          const yDurante = altri[0].getBoundingClientRect().top;
-          libera();
-          const yDopo = altri[0].getBoundingClientRect().top;
-          sospendi();
-          da = yPrima - yDurante; a = yDopo - yDurante;
-        }
-        if(Math.abs(a - da) < 1){ libera(); return r; }
-        const fill = Object.assign({fill:"forwards"}, opz);
-        const lista = altri.map(el=>el.animate({transform:[`translateY(${da}px)`,`translateY(${a}px)`]}, fill));
-        lista.push(pannello.animate({clipPath:["inset(0 -60px 100% -60px)","inset(0 -60px 0 -60px)"]}, opz));
-        const voce = {lista, fine:()=>libera()};
-        inCorso.set(scheda, voce);
-        lista[0].finished.then(()=>{
-          if(inCorso.get(scheda) !== voce) return;
-          inCorso.delete(scheda);
-          const radice = document.documentElement;
-          radice.style.overflowAnchor = "none";
-          libera();
-          lista.forEach(x=>x.cancel());
-          requestAnimationFrame(()=>requestAnimationFrame(()=>radice.style.removeProperty("overflow-anchor")));
-        }).catch(()=>{});
-        return r;
-      }
-      /* chiusura: si anima a pannello ancora aperto, poi si chiude davvero */
-      const altri = seguenti(scheda);
-      let h = pannello.getBoundingClientRect().height;
-      if(altri.length){
-        /* misura esatta: di quanto risalgono davvero le schede sotto a pannello chiuso */
-        const y1 = altri[0].getBoundingClientRect().top;
-        scheda.classList.remove(classe);
-        const y2 = altri[0].getBoundingClientRect().top;
-        scheda.classList.add(classe);
-        h = y1 - y2;
-      }
-      const fill = Object.assign({fill:"forwards"}, opz);
-      const lista = altri.map(el=>el.animate({transform:["translateY(0)",`translateY(${-h}px)`]}, fill));
-      lista.push(pannello.animate({clipPath:["inset(0 -60px 0 -60px)","inset(0 -60px 100% -60px)"], opacity:[1,0]}, fill));
-      const self = this, args = arguments;
-      const voce = {lista, fine:()=>originale.apply(self, args)};
-      inCorso.set(scheda, voce);
-      lista[0].finished.then(()=>{
-        if(inCorso.get(scheda) !== voce) return;
-        inCorso.delete(scheda);
-        const radice = document.documentElement;
-        radice.style.overflowAnchor = "none";
-        originale.apply(self, args);
-        lista.forEach(x=>x.cancel());
-        requestAnimationFrame(()=>requestAnimationFrame(()=>radice.style.removeProperty("overflow-anchor")));
-      }).catch(()=>{});
+    window[nome] = function(){
+      congela();
+      clearTimeout(timer);
+      const r = originale.apply(this, arguments);
+      timer = setTimeout(scongela, 700);
+      return r;
     };
   }
-  avvolgi("impostaGuidaEpisodi", ".episode-guide", 420);
-  avvolgi("impostaGuidaFumetto", ".comic-guide", 380);
+  avvolgi("impostaGuidaEpisodi");
+  avvolgi("impostaGuidaFumetto");
 })();
 </script>
 </body>
