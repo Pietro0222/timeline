@@ -1500,7 +1500,7 @@ html.in-salto .group:not(.meta-salto) .group-head{visibility:hidden}
   html.espansione-fluida .comic-guide{transition:opacity .22s ease,transform .34s cubic-bezier(.22,.8,.25,1)}
 }
 </style>
-<style id="epoche-livelli">@media (min-width:701px){#list > .group{will-change:transform}}</style>
+<style id="epoche-livelli">@media (min-width:701px){#list > .group.livello{will-change:transform}}</style>
 </head>
 <body>
 
@@ -4555,6 +4555,15 @@ if(location.hash.startsWith("#opera-")){
         requestAnimationFrame(()=>requestAnimationFrame(()=>radice.style.removeProperty("overflow-anchor")));
       }).catch(()=>{});
     };
+  }
+  /* Solo le epoche vicine allo schermo sono livelli separati della scheda
+     grafica (servono per spostarle senza ridisegnarle). Tenerle tutte come
+     livelli occupava troppa memoria e, scorrendo veloce, lo sfondo diventava nero. */
+  if("IntersectionObserver" in window){
+    const vicinaLivello = new IntersectionObserver(voci=>voci.forEach(v=>v.target.classList.toggle("livello", v.isIntersecting)), {rootMargin:"100% 0px"});
+    const osserva = ()=>document.querySelectorAll("#list > .group").forEach(g=>vicinaLivello.observe(g));
+    const lista = document.getElementById("list");
+    if(lista){ osserva(); new MutationObserver(osserva).observe(lista, {childList:true}); }
   }
   /* congela gia' a pagina ferma, cosi' anche il primo clic e' leggero */
   addEventListener("load", ()=>setTimeout(()=>(window.requestIdleCallback || setTimeout)(()=>{ if(PC.matches) congelaLontane(); }), 1500));
