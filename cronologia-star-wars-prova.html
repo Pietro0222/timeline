@@ -1492,6 +1492,14 @@ html.in-salto .group:not(.meta-salto) .group-head{visibility:hidden}
 .jump-transition{top:calc(var(--bar-h,0px) - 2px)!important}
 </style>
 <style id="linea-dietro">@media (min-width:701px){html .items .item:is(.film,.serie,.corto,.gioco) .head{background-color:var(--bg,#03050B)}}</style>
+<style id="espansione-fluida">
+/* PC: l'altezza del pannello si imposta subito (un solo calcolo della pagina);
+   l'apertura si vede con animazioni gestite dalla scheda grafica (vedi script). */
+@media (min-width:701px){
+  html.espansione-fluida .episode-guide{transition:opacity .24s ease,transform .38s cubic-bezier(.22,.8,.25,1)}
+  html.espansione-fluida .comic-guide{transition:opacity .22s ease,transform .34s cubic-bezier(.22,.8,.25,1)}
+}
+</style>
 </head>
 <body>
 
@@ -4413,5 +4421,75 @@ if(location.hash.startsWith("#opera-")){
 <!-- Cloudflare Web Analytics -->
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "622c8edc4b314623a9588081a9192323"}'></script>
 <!-- End Cloudflare Web Analytics -->
+<script id="espansione-fluida-js">
+/* Apertura/chiusura dei pannelli (episodi, numeri dei fumetti) su PC.
+   Prima l'altezza del pannello animata ricalcolava tutta la timeline a ogni
+   fotogramma. Ora la pagina viene calcolata una volta sola e l'effetto
+   (pannello che si svela dall'alto, schede sotto che scendono) e' fatto con
+   spostamenti e ritagli, che non richiedono di ricalcolare la pagina. */
+(()=>{
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches || !Element.prototype.animate) return;
+  const PC = matchMedia("(min-width:701px)");
+  const CURVA = "cubic-bezier(.22,.8,.25,1)";
+  document.documentElement.classList.add("espansione-fluida");
+  const inCorso = new WeakMap();
+
+  function seguenti(scheda){
+    const out = [], limite = innerHeight * 1.6;
+    let el = scheda.nextElementSibling;
+    for(; el; el = el.nextElementSibling){ if(el.getBoundingClientRect().top > limite) return out; out.push(el); }
+    let g = scheda.closest(".group");
+    for(g = g && g.nextElementSibling; g; g = g.nextElementSibling){
+      if(g.getBoundingClientRect().top > limite) break;
+      out.push(g);
+    }
+    return out;
+  }
+  function chiudiAnimazioni(scheda){
+    const a = inCorso.get(scheda); if(!a) return;
+    inCorso.delete(scheda); a.fine && a.fine(); a.lista.forEach(x=>x.cancel());
+  }
+  function avvolgi(nome, selPannello, durata){
+    const originale = window[nome];
+    if(typeof originale !== "function") return;
+    window[nome] = function(scheda, apri){
+      if(!PC.matches || !scheda) return originale.apply(this, arguments);
+      const pannello = scheda.querySelector(":scope > " + selPannello);
+      const aperto = scheda.classList.contains(nome === "impostaGuidaEpisodi" ? "episode-guide-open" : "comic-guide-open");
+      chiudiAnimazioni(scheda);
+      if(!pannello || apri === aperto) return originale.apply(this, arguments);
+      const opz = {duration: durata, easing: CURVA};
+      if(apri){
+        const altri = seguenti(scheda);
+        const r = originale.apply(this, arguments);
+        const h = pannello.getBoundingClientRect().height;
+        if(h < 1) return r;
+        const lista = altri.map(el=>el.animate({transform:[`translateY(${-h}px)`,"translateY(0)"]}, opz));
+        lista.push(pannello.animate({clipPath:["inset(0 -60px 100% -60px)","inset(0 -60px 0 -60px)"]}, opz));
+        inCorso.set(scheda,{lista});
+        lista[0].finished.then(()=>{ if(inCorso.get(scheda) && inCorso.get(scheda).lista===lista) inCorso.delete(scheda); }).catch(()=>{});
+        return r;
+      }
+      /* chiusura: si anima a pannello ancora aperto, poi si chiude davvero */
+      const h = pannello.getBoundingClientRect().height;
+      const altri = seguenti(scheda);
+      const fill = Object.assign({fill:"forwards"}, opz);
+      const lista = altri.map(el=>el.animate({transform:["translateY(0)",`translateY(${-h}px)`]}, fill));
+      lista.push(pannello.animate({clipPath:["inset(0 -60px 0 -60px)","inset(0 -60px 100% -60px)"], opacity:[1,0]}, fill));
+      const self = this, args = arguments;
+      const voce = {lista, fine:()=>originale.apply(self, args)};
+      inCorso.set(scheda, voce);
+      lista[0].finished.then(()=>{
+        if(inCorso.get(scheda) !== voce) return;
+        inCorso.delete(scheda);
+        originale.apply(self, args);
+        lista.forEach(x=>x.cancel());
+      }).catch(()=>{});
+    };
+  }
+  avvolgi("impostaGuidaEpisodi", ".episode-guide", 420);
+  avvolgi("impostaGuidaFumetto", ".comic-guide", 380);
+})();
+</script>
 </body>
 </html>
