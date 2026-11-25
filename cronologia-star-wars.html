@@ -1498,7 +1498,25 @@ html.in-salto .group:not(.meta-salto) .group-head{visibility:hidden}
   html.espansione-fluida .comic-guide{transition:opacity .22s ease,transform .34s cubic-bezier(.22,.8,.25,1)}
 }
 </style>
-<style id="epoche-livelli">@media (min-width:701px){#list > .group.livello{will-change:transform}}</style>
+<style id="sfondo-riserva">
+/* Fondale di riserva piu' simile al cielo: se scorrendo veloce il browser non
+   fa in tempo a disegnare il cielo fisso (#sky, #stelle), sotto non compare un
+   fondo quasi nero ma lo stesso blu con qualche stella. Normalmente e' coperto
+   dal cielo e non si vede. Le velature stanno tutte dentro la loro piastrella,
+   cosi' tra una piastrella e l'altra non si vedono giunture. */
+html,body{background-color:#05080F}
+body{
+  background-image:
+    radial-gradient(circle at 23px 31px,rgba(242,247,255,.46) 0 .65px,transparent .95px),
+    radial-gradient(circle at 91px 137px,rgba(193,216,250,.34) 0 .7px,transparent 1px),
+    radial-gradient(circle at 211px 83px,rgba(255,237,207,.27) 0 .75px,transparent 1.1px),
+    radial-gradient(ellipse 34% 26% at 22% 30%,rgba(38,67,112,.22),transparent 100%),
+    radial-gradient(ellipse 30% 24% at 78% 72%,rgba(67,39,91,.16),transparent 100%),
+    linear-gradient(180deg,#060A14 0%,#04060E 50%,#060A14 100%);
+  background-size:173px 211px,257px 331px,389px 487px,100% 1100px,100% 1100px,100% 1100px;
+  background-position:0 0,37px 59px,83px 127px,0 0,0 0,0 0;
+  background-repeat:repeat,repeat,repeat,repeat-y,repeat-y,repeat-y}
+</style>
 </head>
 <body>
 
@@ -4455,13 +4473,22 @@ if(location.hash.startsWith("#opera-")){
     const fisso = el => getComputedStyle(el).position === "fixed";
     let el = scheda.nextElementSibling;
     for(; el; el = el.nextElementSibling){ if(fisso(el)) continue; if(el.getBoundingClientRect().top > limite) return out; out.push(el); }
-    /* le epoche successive si spostano intere: sono gia' livelli separati
-       della scheda grafica (vedi stile), quindi spostarle non costa nulla */
+    /* epoche successive: si spostano solo i pezzi vicini allo schermo
+       (titolo e prime schede), mai l'epoca intera */
     let g = scheda.closest(".group");
     for(g = g && g.nextElementSibling; g; g = g.nextElementSibling){
       if(fisso(g)) continue;
       if(g.getBoundingClientRect().top > limite) break;
-      out.push(g);
+      if(!g.classList.contains("group")){ out.push(g); continue; }
+      for(const figlio of g.children){
+        if(fisso(figlio)) continue;
+        if(figlio.getBoundingClientRect().top > limite) break;
+        if(!figlio.matches(".items")){ out.push(figlio); continue; }
+        for(const it of figlio.children){
+          if(it.getBoundingClientRect().top > limite) break;
+          out.push(it);
+        }
+      }
     }
     return out;
   }
@@ -4548,15 +4575,6 @@ if(location.hash.startsWith("#opera-")){
         requestAnimationFrame(()=>requestAnimationFrame(()=>radice.style.removeProperty("overflow-anchor")));
       }).catch(()=>{});
     };
-  }
-  /* Solo le epoche vicine allo schermo sono livelli separati della scheda
-     grafica (servono per spostarle senza ridisegnarle). Tenerle tutte come
-     livelli occupava troppa memoria e, scorrendo veloce, lo sfondo diventava nero. */
-  if("IntersectionObserver" in window){
-    const vicinaLivello = new IntersectionObserver(voci=>voci.forEach(v=>v.target.classList.toggle("livello", v.isIntersecting)), {rootMargin:"100% 0px"});
-    const osserva = ()=>document.querySelectorAll("#list > .group").forEach(g=>vicinaLivello.observe(g));
-    const lista = document.getElementById("list");
-    if(lista){ osserva(); new MutationObserver(osserva).observe(lista, {childList:true}); }
   }
   /* congela gia' a pagina ferma, cosi' anche il primo clic e' leggero */
   addEventListener("load", ()=>setTimeout(()=>(window.requestIdleCallback || setTimeout)(()=>{ if(PC.matches) congelaLontane(); }), 1500));
