@@ -4455,14 +4455,17 @@ if(location.hash.startsWith("#opera-")){
     window[nome] = function(scheda, apri){
       if(!PC.matches || !scheda) return originale.apply(this, arguments);
       const pannello = scheda.querySelector(":scope > " + selPannello);
-      const aperto = scheda.classList.contains(nome === "impostaGuidaEpisodi" ? "episode-guide-open" : "comic-guide-open");
+      const classe = nome === "impostaGuidaEpisodi" ? "episode-guide-open" : "comic-guide-open";
+      const aperto = scheda.classList.contains(classe);
       chiudiAnimazioni(scheda);
       if(!pannello || apri === aperto) return originale.apply(this, arguments);
       const opz = {duration: durata, easing: CURVA};
       if(apri){
         const altri = seguenti(scheda);
+        const y0 = altri.length ? altri[0].getBoundingClientRect().top : 0;
         const r = originale.apply(this, arguments);
-        const h = pannello.getBoundingClientRect().height;
+        /* spostamento reale delle schede sotto (non solo l'altezza del pannello) */
+        const h = altri.length ? altri[0].getBoundingClientRect().top - y0 : pannello.getBoundingClientRect().height;
         if(h < 1) return r;
         const lista = altri.map(el=>el.animate({transform:[`translateY(${-h}px)`,"translateY(0)"]}, opz));
         lista.push(pannello.animate({clipPath:["inset(0 -60px 100% -60px)","inset(0 -60px 0 -60px)"]}, opz));
@@ -4471,8 +4474,16 @@ if(location.hash.startsWith("#opera-")){
         return r;
       }
       /* chiusura: si anima a pannello ancora aperto, poi si chiude davvero */
-      const h = pannello.getBoundingClientRect().height;
       const altri = seguenti(scheda);
+      let h = pannello.getBoundingClientRect().height;
+      if(altri.length){
+        /* misura esatta: di quanto risalgono davvero le schede sotto a pannello chiuso */
+        const y1 = altri[0].getBoundingClientRect().top;
+        scheda.classList.remove(classe);
+        const y2 = altri[0].getBoundingClientRect().top;
+        scheda.classList.add(classe);
+        h = y1 - y2;
+      }
       const fill = Object.assign({fill:"forwards"}, opz);
       const lista = altri.map(el=>el.animate({transform:["translateY(0)",`translateY(${-h}px)`]}, fill));
       lista.push(pannello.animate({clipPath:["inset(0 -60px 0 -60px)","inset(0 -60px 100% -60px)"], opacity:[1,0]}, fill));
@@ -4482,8 +4493,11 @@ if(location.hash.startsWith("#opera-")){
       lista[0].finished.then(()=>{
         if(inCorso.get(scheda) !== voce) return;
         inCorso.delete(scheda);
+        const radice = document.documentElement;
+        radice.style.overflowAnchor = "none";
         originale.apply(self, args);
         lista.forEach(x=>x.cancel());
+        requestAnimationFrame(()=>requestAnimationFrame(()=>radice.style.removeProperty("overflow-anchor")));
       }).catch(()=>{});
     };
   }
