@@ -4468,21 +4468,47 @@ if(location.hash.startsWith("#opera-")){
       if(!PC.matches || !scheda) return originale.apply(this, arguments);
       const pannello = scheda.querySelector(":scope > " + selPannello);
       const classe = nome === "impostaGuidaEpisodi" ? "episode-guide-open" : "comic-guide-open";
-      const aperto = scheda.classList.contains(classe);
       chiudiAnimazioni(scheda);
+      const aperto = scheda.classList.contains(classe);
       if(!pannello || apri === aperto) return originale.apply(this, arguments);
       const opz = {duration: durata, easing: CURVA};
       if(apri){
+        /* apertura come la chiusura: la pagina si ricalcola solo alla fine.
+           Durante l'animazione il pannello resta "sospeso" sopra le schede
+           (non occupa spazio) e le schede sotto scendono con uno spostamento. */
         const altri = seguenti(scheda);
-        const y0 = altri.length ? altri[0].getBoundingClientRect().top : 0;
+        const st = pannello.style;
+        const sospendi = ()=>{ st.position="absolute"; st.left=pannello.offsetLeft+"px"; st.top=pannello.offsetTop+"px"; st.width=pannello.offsetWidth+"px"; st.zIndex="1"; };
+        const libera = ()=>{ ["position","left","top","width","z-index"].forEach(k=>st.removeProperty(k)); };
+        /* posizione delle schede sotto: prima, durante (pannello sospeso) e dopo.
+           Aprire una scheda puo' cambiare anche il margine della scheda seguente
+           (schede sfalsate), quindi si misura tutto invece di stimarlo. */
+        const yPrima = altri.length ? altri[0].getBoundingClientRect().top : 0;
+        sospendi();
         const r = originale.apply(this, arguments);
-        /* spostamento reale delle schede sotto (non solo l'altezza del pannello) */
-        const h = altri.length ? altri[0].getBoundingClientRect().top - y0 : pannello.getBoundingClientRect().height;
-        if(h < 1) return r;
-        const lista = altri.map(el=>el.animate({transform:[`translateY(${-h}px)`,"translateY(0)"]}, opz));
+        let da = 0, a = pannello.getBoundingClientRect().height;
+        if(altri.length){
+          const yDurante = altri[0].getBoundingClientRect().top;
+          libera();
+          const yDopo = altri[0].getBoundingClientRect().top;
+          sospendi();
+          da = yPrima - yDurante; a = yDopo - yDurante;
+        }
+        if(Math.abs(a - da) < 1){ libera(); return r; }
+        const fill = Object.assign({fill:"forwards"}, opz);
+        const lista = altri.map(el=>el.animate({transform:[`translateY(${da}px)`,`translateY(${a}px)`]}, fill));
         lista.push(pannello.animate({clipPath:["inset(0 -60px 100% -60px)","inset(0 -60px 0 -60px)"]}, opz));
-        inCorso.set(scheda,{lista});
-        lista[0].finished.then(()=>{ if(inCorso.get(scheda) && inCorso.get(scheda).lista===lista) inCorso.delete(scheda); }).catch(()=>{});
+        const voce = {lista, fine:()=>libera()};
+        inCorso.set(scheda, voce);
+        lista[0].finished.then(()=>{
+          if(inCorso.get(scheda) !== voce) return;
+          inCorso.delete(scheda);
+          const radice = document.documentElement;
+          radice.style.overflowAnchor = "none";
+          libera();
+          lista.forEach(x=>x.cancel());
+          requestAnimationFrame(()=>requestAnimationFrame(()=>radice.style.removeProperty("overflow-anchor")));
+        }).catch(()=>{});
         return r;
       }
       /* chiusura: si anima a pannello ancora aperto, poi si chiude davvero */
