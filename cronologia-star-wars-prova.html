@@ -4436,12 +4436,24 @@ if(location.hash.startsWith("#opera-")){
 
   function seguenti(scheda){
     const out = [], limite = innerHeight * 1.6;
+    const fisso = el => getComputedStyle(el).position === "fixed";
     let el = scheda.nextElementSibling;
-    for(; el; el = el.nextElementSibling){ if(el.getBoundingClientRect().top > limite) return out; out.push(el); }
+    for(; el; el = el.nextElementSibling){ if(fisso(el)) continue; if(el.getBoundingClientRect().top > limite) return out; out.push(el); }
+    /* le epoche successive sono lunghissime: non si spostano intere (la scheda
+       grafica dovrebbe ridisegnarle tutte, ci vogliono secondi), ma solo i loro
+       pezzi visibili: titolo e prime schede */
     let g = scheda.closest(".group");
     for(g = g && g.nextElementSibling; g; g = g.nextElementSibling){
       if(g.getBoundingClientRect().top > limite) break;
-      out.push(g);
+      if(!g.classList.contains("group")){ if(!fisso(g)) out.push(g); continue; }
+      for(const figlio of g.children){
+        if(figlio.getBoundingClientRect().top > limite) break;
+        if(!figlio.matches(".items")){ if(!fisso(figlio)) out.push(figlio); continue; }
+        for(const it of figlio.children){
+          if(it.getBoundingClientRect().top > limite) break;
+          out.push(it);
+        }
+      }
     }
     return out;
   }
