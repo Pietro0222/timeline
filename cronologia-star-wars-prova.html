@@ -4435,6 +4435,28 @@ if(location.hash.startsWith("#opera-")){
   document.documentElement.classList.add("espansione-fluida");
   const inCorso = new WeakMap();
 
+  /* Epoche lontane dallo schermo "congelate": mantengono la loro altezza esatta
+     ma il browser non le ricalcola. Cosi' i calcoli all'apertura costano poco
+     (soprattutto su Safari). Tornano normali appena si avvicinano allo schermo. */
+  const puoCongelare = "contentVisibility" in document.documentElement.style && "IntersectionObserver" in window;
+  const vicino = puoCongelare ? new IntersectionObserver(voci=>voci.forEach(v=>{
+    if(!v.isIntersecting) return;
+    const g = v.target; vicino.unobserve(g);
+    g.style.removeProperty("content-visibility"); g.style.removeProperty("contain-intrinsic-size");
+  }), {rootMargin:"150% 0px"}) : null;
+  function congelaLontane(){
+    if(!puoCongelare) return;
+    const margine = innerHeight * 1.5;
+    document.querySelectorAll("#list > .group").forEach(g=>{
+      if(g.style.contentVisibility) return;
+      const r = g.getBoundingClientRect();
+      if(r.bottom > -margine && r.top < innerHeight + margine) return;
+      g.style.containIntrinsicSize = `auto ${r.width}px auto ${r.height}px`;
+      g.style.contentVisibility = "auto";
+      vicino.observe(g);
+    });
+  }
+
   function seguenti(scheda){
     const out = [], limite = innerHeight * 1.6;
     const fisso = el => getComputedStyle(el).position === "fixed";
@@ -4459,6 +4481,7 @@ if(location.hash.startsWith("#opera-")){
     if(typeof originale !== "function") return;
     window[nome] = function(scheda, apri){
       if(!PC.matches || !scheda) return originale.apply(this, arguments);
+      congelaLontane();
       const pannello = scheda.querySelector(":scope > " + selPannello);
       const classe = nome === "impostaGuidaEpisodi" ? "episode-guide-open" : "comic-guide-open";
       chiudiAnimazioni(scheda);
@@ -4477,23 +4500,17 @@ if(location.hash.startsWith("#opera-")){
            Aprire una scheda puo' cambiare anche il margine della scheda seguente
            (schede sfalsate), quindi si misura tutto invece di stimarlo. */
         const yPrima = altri.length ? altri[0].getBoundingClientRect().top : 0;
-        sospendi();
         const r = originale.apply(this, arguments);
-        let da = 0, a = pannello.getBoundingClientRect().height;
-        const yDurante = altri.length ? altri[0].getBoundingClientRect().top : 0;
-        libera();
+        /* due soli ricalcoli: posizione finale (pannello al suo posto) e
+           posizione durante l'animazione (pannello sospeso) */
         const yDopo = altri.length ? altri[0].getBoundingClientRect().top : 0;
-        const giusto = pannello.getBoundingClientRect();
-        sospendi();
-        /* il pannello sospeso va messo esattamente dove sara' alla fine
-           (le schede di sinistra hanno margini diversi) */
-        const ora = pannello.getBoundingClientRect();
-        st.margin = "0";
-        const ora2 = pannello.getBoundingClientRect();
-        st.left = (parseFloat(st.left) + giusto.left - ora2.left) + "px";
-        st.top = (parseFloat(st.top) + giusto.top - ora2.top) + "px";
-        st.width = giusto.width + "px";
-        if(altri.length){ da = yPrima - yDurante; a = yDopo - yDurante; }
+        /* posizione di impaginazione (senza la piccola traslazione animata) */
+        const sx = pannello.offsetLeft, sy = pannello.offsetTop, sw = pannello.offsetWidth, sh = pannello.offsetHeight;
+        st.margin = "0"; st.position = "absolute"; st.zIndex = "1";
+        st.left = sx + "px"; st.top = sy + "px"; st.width = sw + "px";
+        const yDurante = altri.length ? altri[0].getBoundingClientRect().top : 0;
+        const da = altri.length ? yPrima - yDurante : 0;
+        const a = altri.length ? yDopo - yDurante : sh;
         if(Math.abs(a - da) < 1){ libera(); return r; }
         const fill = Object.assign({fill:"forwards"}, opz);
         const lista = altri.map(el=>el.animate({transform:[`translateY(${da}px)`,`translateY(${a}px)`]}, fill));
@@ -4539,6 +4556,8 @@ if(location.hash.startsWith("#opera-")){
       }).catch(()=>{});
     };
   }
+  /* congela gia' a pagina ferma, cosi' anche il primo clic e' leggero */
+  addEventListener("load", ()=>setTimeout(()=>(window.requestIdleCallback || setTimeout)(()=>{ if(PC.matches) congelaLontane(); }), 1500));
   avvolgi("impostaGuidaEpisodi", ".episode-guide", 420);
   avvolgi("impostaGuidaFumetto", ".comic-guide", 380);
 })();
