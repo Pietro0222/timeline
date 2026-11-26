@@ -1556,6 +1556,20 @@ addEventListener("DOMContentLoaded",()=>{
   aggiorna();
 });
 </script>
+<style id="aree-sicure">
+/* iPhone: la pagina continua sotto la barra di stato e sotto la barra di Safari
+   (viewport-fit=cover); testi e tasti restano fuori dalle zone occupate dalle
+   barre grazie a env(safe-area-inset-*), che altrove vale 0. */
+:root{--ribbon-gap:calc(12px + env(safe-area-inset-top,0px))}
+html,body{background-color:#090D17}
+.masthead{padding-top:calc(52px + env(safe-area-inset-top,0px))}
+.wrap{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+@media (min-width:761px){.masthead{padding-top:calc(38px + env(safe-area-inset-top,0px))}}
+@media (max-width:560px){
+  .masthead{padding-top:calc(38px + env(safe-area-inset-top,0px))}
+  .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+}
+</style>
 </head>
 <body>
 
@@ -3842,7 +3856,9 @@ window.addEventListener("resize", ()=>{
    netto), quindi il rimpicciolimento finisce proprio quando resta
    attaccato alla barra di ricerca, senza salti. */
 const RIBBON_RANGE = 160;
-const RIBBON_GAP = 12; /* deve combaciare con --ribbon-gap nel CSS */
+/* deve combaciare con --ribbon-gap nel CSS: 12 px piu' l'eventuale zona della
+   barra di stato dell'iPhone (env(safe-area-inset-top), altrove 0) */
+const RIBBON_GAP = 12 + (()=>{ const d=document.createElement("div"); d.style.cssText="position:absolute;visibility:hidden;padding-top:env(safe-area-inset-top,0px)"; document.documentElement.append(d); const v=parseFloat(getComputedStyle(d).paddingTop)||0; d.remove(); return v; })();
 const PASSI_MISURA_HEADER = 10;
 let progressoHeaderCorrente = 0;
 let corsaHeader = RIBBON_RANGE;
