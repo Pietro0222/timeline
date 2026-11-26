@@ -1535,11 +1535,27 @@ body{
   html.testata-unica .masthead{
     border-image-source:linear-gradient(rgba(3,5,11,.97),rgba(3,5,11,.97));
     border-image-slice:0 fill;border-image-width:0;
-    border-image-outset:400px 50vw 174px 50vw
+    border-image-outset:400px 50vw var(--testata-giu,174px) 50vw
   }
 }
 </style>
-<script>if(window.CSS&&CSS.supports("-webkit-touch-callout","none"))document.documentElement.classList.add("testata-unica")</script>
+<script>if(window.CSS&&CSS.supports("-webkit-touch-callout","none"))document.documentElement.classList.add("testata-unica");
+/* il fondo scuro dipinto dal titolo deve arrivare fino alla barra di ricerca/filtri,
+   come faceva il pannello: segue la stessa altezza che la pagina calcola per il pannello
+   (cambia quando si aprono ricerca o filtri) */
+addEventListener("DOMContentLoaded",()=>{
+  const pannello=document.querySelector(".top-panel"), testata=document.querySelector(".masthead");
+  if(!pannello||!testata) return;
+  const aggiorna=()=>{
+    const h=parseFloat(pannello.style.getPropertyValue("--top-panel-h"));
+    if(!h) return;
+    const giu=Math.max(0, Math.ceil(h-(testata.offsetTop+testata.offsetHeight)));
+    if(testata.style.getPropertyValue("--testata-giu")!==giu+"px") testata.style.setProperty("--testata-giu",giu+"px");
+  };
+  new MutationObserver(aggiorna).observe(pannello,{attributes:true,attributeFilter:["style"]});
+  aggiorna();
+});
+</script>
 </head>
 <body>
 
