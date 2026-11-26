@@ -1573,15 +1573,17 @@ html,body{background-color:#090D17}
 <script id="barre-safari">
 /* Safari 26 su iPhone/iPad colora le barre in base agli elementi fissi che trova
    sui bordi dello schermo. Due strisce sottili, nascoste sotto le barre:
-   - in alto nera: la zona della barra di stato resta nera anche a pagina appena aperta;
+   - in alto nera (zona della barra di stato + 4 px): resta nera anche a pagina appena aperta;
    - in basso trasparente: sotto la barra di Safari si continua a vedere la pagina
      invece di una banda colorata. */
 if(window.CSS && CSS.supports("-webkit-touch-callout","none")){
   addEventListener("DOMContentLoaded",()=>{
-    const striscia=(dove,colore)=>{ const d=document.createElement("div"); d.setAttribute("aria-hidden","true");
-      d.style.cssText="position:fixed;left:0;right:0;"+dove+":0;height:4px;z-index:2147483646;pointer-events:auto;background-color:"+colore;
+    const striscia=(dove,altezza,colore)=>{ const d=document.createElement("div"); d.setAttribute("aria-hidden","true");
+      d.style.cssText="position:fixed;left:0;right:0;"+dove+":0;height:"+altezza+";z-index:2147483646;pointer-events:auto;background-color:"+colore;
       document.body.append(d); };
-    striscia("top","#03050B"); striscia("bottom","transparent");
+    /* in alto copre tutta la zona della barra di stato e 4 px sotto, dove Safari guarda */
+    striscia("top","calc(env(safe-area-inset-top,0px) + 4px)","#03050B");
+    striscia("bottom","4px","transparent");
   });
 }
 </script>
