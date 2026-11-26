@@ -1570,27 +1570,20 @@ html,body{background-color:#090D17}
   .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
 }
 </style>
-<script id="diagnosi-bordi">
-/* SOLO PROVA: ?bordi=a/b per capire cosa fa disegnare a Safari le bande sopra e sotto */
-(()=>{const t=new URLSearchParams(location.search).get("bordi"); if(!t) return;
-  const r={a:"#stelle{top:3px!important;bottom:auto!important;height:calc(100lvh - 6px)!important}#sky{top:3px!important;bottom:auto!important;height:calc(100lvh - 6px)!important}",
-           b:"#stelle,#sky{display:none!important}",
-           c:".jump-transition:not(.is-visible):not(.is-exiting),.jump-header-snapshot:not(.is-visible){display:none!important}",
-           d:".jump-transition:not(.is-visible):not(.is-exiting),.jump-header-snapshot:not(.is-visible),.back-top{display:none!important}",
-           e:".jump-transition:not(.is-visible):not(.is-exiting),.jump-header-snapshot:not(.is-visible),.back-top,#stelle,#sky{display:none!important}",
-           h:"html,body{background-color:transparent!important}",
-           i:"@media (max-width:700px){.ribbon::after{top:calc(-1*var(--ribbon-gap) + 6px)!important}}",
-           j:"@media (max-width:700px){.ribbon::after{top:calc(-1*var(--ribbon-gap) + 6px)!important}}html,body{background-color:transparent!important}"};
-  if(t==="k"||t==="l"||t==="m"){ addEventListener("DOMContentLoaded",()=>{ const d=document.createElement("div");
-    /* striscia sul bordo basso che Safari "vede" (cliccabile e sopra a tutto) */
-    d.style.cssText="position:fixed;left:0;right:0;bottom:0;height:"+(t==="m"?"14px":"4px")+";z-index:2147483646;pointer-events:auto;background-color:"+(t==="k"?"transparent":"rgba(0,0,0,0.01)");
-    document.body.append(d); }); }
-  if(t==="f"||t==="g"){ addEventListener("DOMContentLoaded",()=>{ const d=document.createElement("div");
-    d.style.cssText="position:fixed;left:0;right:0;bottom:0;height:6px;z-index:1;pointer-events:none;background-color:"+(t==="f"?"transparent":"rgba(9,13,23,.02)");
-    document.body.append(d); }); }
-  const st=document.createElement("style"); st.textContent=r[t]||""; document.head.append(st);
-  addEventListener("DOMContentLoaded",()=>{const e=document.createElement("div");e.textContent="prova bordi "+t;e.style.cssText="position:fixed;left:8px;top:45%;z-index:9999;background:#a00;color:#fff;font:12px sans-serif;padding:3px 6px;border-radius:4px";document.body.append(e)});
-})();
+<script id="barre-safari">
+/* Safari 26 su iPhone/iPad colora le barre in base agli elementi fissi che trova
+   sui bordi dello schermo. Due strisce sottili, nascoste sotto le barre:
+   - in alto nera: la zona della barra di stato resta nera anche a pagina appena aperta;
+   - in basso trasparente: sotto la barra di Safari si continua a vedere la pagina
+     invece di una banda colorata. */
+if(window.CSS && CSS.supports("-webkit-touch-callout","none")){
+  addEventListener("DOMContentLoaded",()=>{
+    const striscia=(dove,colore)=>{ const d=document.createElement("div"); d.setAttribute("aria-hidden","true");
+      d.style.cssText="position:fixed;left:0;right:0;"+dove+":0;height:4px;z-index:2147483646;pointer-events:auto;background-color:"+colore;
+      document.body.append(d); };
+    striscia("top","#03050B"); striscia("bottom","transparent");
+  });
+}
 </script>
 </head>
 <body>
