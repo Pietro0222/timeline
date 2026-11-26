@@ -4390,13 +4390,23 @@ if(location.hash.startsWith("#opera-")){
   st.textContent="@keyframes stelleCiclo{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-820px,0)}}"
     +"#stelle .layer{animation:stelleCiclo 1s linear both;animation-timeline:scroll(root block)}";
   document.head.append(st);
-  const aggiorna=()=>{
-    const max=Math.max(1,document.documentElement.scrollHeight-document.documentElement.clientHeight);
-    strati.forEach(el=>el.style.animationIterationCount=(max*Number(el.dataset.depth)/820).toFixed(5));
-  };
-  aggiorna();
-  addEventListener("resize",aggiorna);
-  if("ResizeObserver" in window) new ResizeObserver(aggiorna).observe(document.body);
+  /* Il ciclo e' legato a un tratto fisso di scorrimento (CORSA px) invece che
+     all'altezza della pagina: quando un riquadro si espande la pagina si
+     allunga, ma lo spostamento delle stelle resta scorrimento x profondita'
+     e non salta piu' (prima si ricalcolava un fotogramma in ritardo). */
+  const CORSA=500000;
+  if(CSS.supports("animation-range","0px 1px")){
+    st.textContent+="#stelle .layer{animation-range:0px "+CORSA+"px}";
+    strati.forEach(el=>el.style.animationIterationCount=(CORSA*Number(el.dataset.depth)/820).toFixed(5));
+  }else{
+    const aggiorna=()=>{
+      const max=Math.max(1,document.documentElement.scrollHeight-document.documentElement.clientHeight);
+      strati.forEach(el=>el.style.animationIterationCount=(max*Number(el.dataset.depth)/820).toFixed(5));
+    };
+    aggiorna();
+    addEventListener("resize",aggiorna);
+    if("ResizeObserver" in window) new ResizeObserver(aggiorna).observe(document.body);
+  }
   aggiornaParallasse = ()=>{};
 })();
 </script>
