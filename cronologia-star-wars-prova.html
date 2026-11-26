@@ -1525,30 +1525,17 @@ body{
   background-repeat:repeat,repeat,repeat,repeat-y,repeat-y,repeat-y}
 </style>
 <style id="testata-unica">
-/* iPhone: la sfumatura nera dietro i titoli delle epoche non e' piu' un
-   elemento a parte (::before/::after) ma e' dipinta dal titolo stesso con
-   border-image, che si estende fuori dal titolo senza occupare spazio.
-   Stesso aspetto; serve a evitare che Safari "allunghi" la sfumatura come
-   una tendina nera scorrendo veloce verso l'alto. */
+/* iPhone: il fondo scuro dietro il titolo "Timeline Canonica" non e' piu' un
+   pannello separato (.top-panel) ma e' dipinto dal titolo stesso (border-image
+   che si estende a tutta larghezza senza occupare spazio). Stesso aspetto;
+   il pannello separato era quello che Safari, invertendo lo scorrimento,
+   allungava in una tendina nera. */
 @media (max-width:700px){
-  html.testata-unica .group-head::before,
-  html.testata-unica .group-head::after{content:none}
-  html.testata-unica .group-head{
-    border-image-source:linear-gradient(to bottom,
-      rgba(3,5,11,0) 0px,
-      rgba(3,5,11,1) 76px,
-      rgba(3,5,11,1) calc(76px + (100% - 76px)*0),
-      rgba(3,5,11,1) calc(76px + (100% - 76px)*0.6),
-      rgba(3,5,11,0.86) calc(76px + (100% - 76px)*0.66),
-      rgba(3,5,11,0.68) calc(76px + (100% - 76px)*0.72),
-      rgba(3,5,11,0.5) calc(76px + (100% - 76px)*0.78),
-      rgba(3,5,11,0.35) calc(76px + (100% - 76px)*0.84),
-      rgba(3,5,11,0.22) calc(76px + (100% - 76px)*0.89),
-      rgba(3,5,11,0.12) calc(76px + (100% - 76px)*0.94),
-      rgba(3,5,11,0.04) calc(76px + (100% - 76px)*0.98),
-      rgba(3,5,11,0) calc(76px + (100% - 76px)*1));
+  html.testata-unica .top-panel{display:none}
+  html.testata-unica .masthead{
+    border-image-source:linear-gradient(rgba(3,5,11,.97),rgba(3,5,11,.97));
     border-image-slice:0 fill;border-image-width:0;
-    border-image-outset:76px 50vw 55px 50vw;border-image-repeat:stretch
+    border-image-outset:400px 50vw 174px 50vw
   }
 }
 </style>
