@@ -1570,25 +1570,24 @@ html,body{background-color:#090D17}
   .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
 }
 </style>
-<script id="barre-safari">
+<style id="barre-safari">
 /* Safari 26 su iPhone/iPad colora le barre in base agli elementi fissi che trova
-   sui bordi dello schermo. Due strisce sottili, nascoste sotto le barre:
-   - in alto nera (zona della barra di stato + 4 px): resta nera anche a pagina appena aperta;
-   - in basso trasparente: sotto la barra di Safari si continua a vedere la pagina
-     invece di una banda colorata. */
-if(window.CSS && CSS.supports("-webkit-touch-callout","none")){
-  addEventListener("DOMContentLoaded",()=>{
-    const striscia=(dove,altezza,colore)=>{ const d=document.createElement("div"); d.setAttribute("aria-hidden","true");
-      d.style.cssText="position:fixed;left:0;right:0;"+dove+":0;height:"+altezza+";z-index:2147483646;pointer-events:auto;background-color:"+colore;
-      document.body.append(d); };
-    /* in alto copre tutta la zona della barra di stato e 4 px sotto, dove Safari guarda */
-    striscia("top","calc(env(safe-area-inset-top,0px) + 4px)","#03050B");
-    striscia("bottom","4px","transparent");
-  });
+   sui bordi dello schermo. Due strisce sottili, scritte direttamente nella pagina
+   (così ci sono già al primo disegno, anche ricaricando):
+   - in alto nera (zona della barra di stato + 4 px);
+   - in basso trasparente: sotto la barra di Safari si vede la pagina.
+   Solo su iPhone/iPad: altrove restano nascoste. */
+.barra-safari{display:none}
+@supports (-webkit-touch-callout:none){
+  html,body{background-color:#03050B}
+  .barra-safari{display:block;position:fixed;left:0;right:0;z-index:2147483646;pointer-events:auto}
+  .barra-safari.su{top:0;height:calc(env(safe-area-inset-top,0px) + 4px);background-color:#03050B}
+  .barra-safari.giu{bottom:0;height:4px;background-color:transparent}
 }
-</script>
+</style>
 </head>
 <body>
+<div class="barra-safari su" aria-hidden="true"></div><div class="barra-safari giu" aria-hidden="true"></div>
 
 <div id="sky" aria-hidden="true">
   <div class="neb a"></div><div class="neb b"></div>
