@@ -1504,7 +1504,12 @@ html.in-salto .group:not(.meta-salto) .group-head{visibility:hidden}
    fondo quasi nero ma lo stesso blu con qualche stella. Normalmente e' coperto
    dal cielo e non si vede. Le velature stanno tutte dentro la loro piastrella,
    cosi' tra una piastrella e l'altra non si vedono giunture. */
-html,body{background-color:#05080F}
+html,body{background-color:#090D17}
+/* Colore di base del cielo uguale al suo blu medio: e' il colore che Safari
+   mostra nei pezzi di cielo non ancora disegnati scorrendo veloce (la
+   "tendina" che scende dall'alto). Le sfumature del cielo lo coprono del
+   tutto, quindi normalmente non cambia nulla. */
+#sky{background-color:#090D17}
 body{
   background-image:
     radial-gradient(circle at 23px 31px,rgba(242,247,255,.46) 0 .65px,transparent .95px),
@@ -1517,6 +1522,22 @@ body{
   background-position:0 0,37px 59px,83px 127px,0 0,0 0,0 0;
   background-repeat:repeat,repeat,repeat,repeat-y,repeat-y,repeat-y}
 </style>
+<style id="testata-unica">
+/* iPhone: il fondo scuro dietro il titolo "Timeline Canonica" non e' piu' un
+   pannello separato (.top-panel) ma e' dipinto dal titolo stesso (border-image
+   che si estende a tutta larghezza senza occupare spazio). Stesso aspetto;
+   il pannello separato era quello che Safari, invertendo lo scorrimento,
+   allungava in una tendina nera. */
+@media (max-width:700px){
+  html.testata-unica .top-panel{display:none}
+  html.testata-unica .masthead{
+    border-image-source:linear-gradient(rgba(3,5,11,.97),rgba(3,5,11,.97));
+    border-image-slice:0 fill;border-image-width:0;
+    border-image-outset:400px 50vw 174px 50vw
+  }
+}
+</style>
+<script>if(window.CSS&&CSS.supports("-webkit-touch-callout","none"))document.documentElement.classList.add("testata-unica")</script>
 </head>
 <body>
 
