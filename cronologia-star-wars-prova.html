@@ -2370,6 +2370,14 @@ const COPERTINE_ATTIVE = true;
    tutte le copertine a ogni apertura. Incrementare questo valore soltanto
    quando vengono sostituite delle immagini mantenendo lo stesso nome. */
 const CACHE_BUST = "20260907-1";
+/* Copertine in WebP grandi quanto servono (il doppio della misura a schermo su
+   PC, il triplo su telefono anche a scheda ingrandita): stesso aspetto, file e
+   decodifica piu' leggeri. Le poche dove il WebP non conveniva restano originali. */
+const COPERTINE_ORIGINALI = new Set(["MandoStagione2Poster.webp", "andor stagione 2.webp", "andor.jpg", "bad batch stagione 3.webp", "boba-fett.jpg", "clone-wars-film.jpg", "darth-vader-2015-vol2-ombre-e-segreti.jpg", "impero-a-pezzi.jpg", "mandalorian-and-grogu.jpg", "mando stagione 3.jpeg", "maul-shadow-lord.jpg", "rebels stagione 1.webp", "rebels stagione 2.webp", "rebels stagione 3.webp", "resistance stagione 2.webp", "skeleton-crew.jpg", "star-wars-2015-vol2-resa-dei-conti-luna-contrabbandieri.jpg"]);
+function percorsoCopertina(img, grande){
+  if(COPERTINE_ORIGINALI.has(img)) return (grande ? "immagini/" : "immagini-ridotte/") + img;
+  return "copertine/" + (grande ? "f-" : "r-") + img.replace(/\.[^.]+$/, "") + ".webp";
+}
 
 /* Ordine sequenziale ufficiale Lucasfilm. Il codice compatto indica
    stagione ed episodio nella numerazione di pubblicazione (es. 216 = S2 E16). */
@@ -3041,7 +3049,7 @@ function voce(o, lato){
     : `${fumettoAperto?"Chiudi":"Apri"} i numeri contenuti in ${o.ti}`;
   const meta = [tipoLab, o.rl].concat(o.lg?["Legends"]:[]);
   const mostraImg = COPERTINE_ATTIVE && o.img;
-  const src = mostraImg ? `<img data-shot data-src="${tipo==="film"||tipo==="gioco"?"immagini":"immagini-ridotte"}/${esc(o.img)}?v=${CACHE_BUST}" alt="" draggable="false" loading="eager" decoding="async">` : "";
+  const src = mostraImg ? `<img data-shot data-src="${esc(percorsoCopertina(o.img, tipo==="film"||tipo==="gioco"))}?v=${CACHE_BUST}" alt="" draggable="false" loading="eager" decoding="async">` : "";
   return `<li class="item ${lato} ${o.lg?"legends":""} ${schedeIngrandite.has(o.id)?"mobile-ingrandita":""} ${haGuidaEpisodi?"has-episode-guide":""} ${guidaAperta?"episode-guide-open":""} ${haGuidaFumetto?"has-comic-guide":""} ${fumettoAperto?"comic-guide-open":""}" id="opera-${o.id}" data-opera-tipo="${esc(tipo)}">
     <${tagTesta} class="head"${interattiva?` type="button" aria-expanded="${String(guidaAperta || fumettoAperto)}" aria-controls="${idPannello}" aria-label="${esc(ariaLabel)}"`:""}>
       <figure class="shot${mostraImg?"":" vuoto"}" data-tipo="${esc(tipoLab)}">${src}</figure>
