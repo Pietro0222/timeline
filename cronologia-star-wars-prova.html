@@ -1570,6 +1570,15 @@ html,body{background-color:#090D17}
   .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
 }
 </style>
+<script id="diagnosi-bordi">
+/* SOLO PROVA: ?bordi=a/b per capire cosa fa disegnare a Safari le bande sopra e sotto */
+(()=>{const t=new URLSearchParams(location.search).get("bordi"); if(!t) return;
+  const r={a:"#stelle{top:3px!important;bottom:auto!important;height:calc(100lvh - 6px)!important}#sky{top:3px!important;bottom:auto!important;height:calc(100lvh - 6px)!important}",
+           b:"#stelle,#sky{display:none!important}"};
+  const st=document.createElement("style"); st.textContent=r[t]||""; document.head.append(st);
+  addEventListener("DOMContentLoaded",()=>{const e=document.createElement("div");e.textContent="prova bordi "+t;e.style.cssText="position:fixed;left:8px;top:45%;z-index:9999;background:#a00;color:#fff;font:12px sans-serif;padding:3px 6px;border-radius:4px";document.body.append(e)});
+})();
+</script>
 </head>
 <body>
 
