@@ -1581,6 +1581,10 @@ html,body{background-color:#090D17}
            h:"html,body{background-color:transparent!important}",
            i:"@media (max-width:700px){.ribbon::after{top:calc(-1*var(--ribbon-gap) + 6px)!important}}",
            j:"@media (max-width:700px){.ribbon::after{top:calc(-1*var(--ribbon-gap) + 6px)!important}}html,body{background-color:transparent!important}"};
+  if(t==="k"||t==="l"||t==="m"){ addEventListener("DOMContentLoaded",()=>{ const d=document.createElement("div");
+    /* striscia sul bordo basso che Safari "vede" (cliccabile e sopra a tutto) */
+    d.style.cssText="position:fixed;left:0;right:0;bottom:0;height:"+(t==="m"?"14px":"4px")+";z-index:2147483646;pointer-events:auto;background-color:"+(t==="k"?"transparent":"rgba(0,0,0,0.01)");
+    document.body.append(d); }); }
   if(t==="f"||t==="g"){ addEventListener("DOMContentLoaded",()=>{ const d=document.createElement("div");
     d.style.cssText="position:fixed;left:0;right:0;bottom:0;height:6px;z-index:1;pointer-events:none;background-color:"+(t==="f"?"transparent":"rgba(9,13,23,.02)");
     document.body.append(d); }); }
