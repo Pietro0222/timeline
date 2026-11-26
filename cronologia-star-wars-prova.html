@@ -1553,6 +1553,22 @@ body{
 }
 </style>
 <script>if(window.CSS&&CSS.supports("-webkit-touch-callout","none"))document.documentElement.classList.add("testata-unica")</script>
+<script id="diagnosi-tendina">
+/* SOLO PER LA PROVA: ?tenda=a/b/c/d spegne a turno i fondi neri per capire
+   quale crea la tendina su iPhone. Da togliere dopo la diagnosi. */
+(()=>{const t=new URLSearchParams(location.search).get("tenda"); if(!t) return;
+  const regole={
+    a:".top-panel{background:transparent!important}",
+    b:".group-head{border-image:none!important}.group-head::before,.group-head::after{background:transparent!important}",
+    c:".ribbon::before,.ribbon::after,#controls::before,.controls::before{background:transparent!important}",
+    d:"#sky{background-color:#3a0000!important}"
+  };
+  const css=[...t].map(k=>regole[k]||"").join("");
+  const st=document.createElement("style"); st.textContent=css; document.head.append(st);
+  addEventListener("DOMContentLoaded",()=>{const b=document.createElement("div");b.textContent="prova tenda "+t;
+    b.style.cssText="position:fixed;left:8px;bottom:8px;z-index:9999;background:#a00;color:#fff;font:12px sans-serif;padding:3px 6px;border-radius:4px";document.body.append(b)});
+})();
+</script>
 </head>
 <body>
 
