@@ -1578,7 +1578,9 @@ html,body{background-color:#090D17}
            c:".jump-transition:not(.is-visible):not(.is-exiting),.jump-header-snapshot:not(.is-visible){display:none!important}",
            d:".jump-transition:not(.is-visible):not(.is-exiting),.jump-header-snapshot:not(.is-visible),.back-top{display:none!important}",
            e:".jump-transition:not(.is-visible):not(.is-exiting),.jump-header-snapshot:not(.is-visible),.back-top,#stelle,#sky{display:none!important}",
-           h:"html,body{background-color:transparent!important}"};
+           h:"html,body{background-color:transparent!important}",
+           i:"@media (max-width:700px){.ribbon::after{top:calc(-1*var(--ribbon-gap) + 6px)!important}}",
+           j:"@media (max-width:700px){.ribbon::after{top:calc(-1*var(--ribbon-gap) + 6px)!important}}html,body{background-color:transparent!important}"};
   if(t==="f"||t==="g"){ addEventListener("DOMContentLoaded",()=>{ const d=document.createElement("div");
     d.style.cssText="position:fixed;left:0;right:0;bottom:0;height:6px;z-index:1;pointer-events:none;background-color:"+(t==="f"?"transparent":"rgba(9,13,23,.02)");
     document.body.append(d); }); }
