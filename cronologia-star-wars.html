@@ -1533,13 +1533,59 @@ body{
   html.testata-unica .masthead{
     border-image-source:linear-gradient(rgba(3,5,11,.97),rgba(3,5,11,.97));
     border-image-slice:0 fill;border-image-width:0;
-    border-image-outset:400px 50vw 174px 50vw
+    border-image-outset:400px 50vw var(--testata-giu,174px) 50vw
   }
 }
 </style>
-<script>if(window.CSS&&CSS.supports("-webkit-touch-callout","none"))document.documentElement.classList.add("testata-unica")</script>
+<script>if(window.CSS&&CSS.supports("-webkit-touch-callout","none"))document.documentElement.classList.add("testata-unica");
+/* il fondo scuro dipinto dal titolo deve arrivare fino alla barra di ricerca/filtri,
+   come faceva il pannello: segue la stessa altezza che la pagina calcola per il pannello
+   (cambia quando si aprono ricerca o filtri) */
+addEventListener("DOMContentLoaded",()=>{
+  const pannello=document.querySelector(".top-panel"), testata=document.querySelector(".masthead");
+  if(!pannello||!testata) return;
+  const aggiorna=()=>{
+    const h=parseFloat(pannello.style.getPropertyValue("--top-panel-h"));
+    if(!h) return;
+    const giu=Math.max(0, Math.ceil(h-(testata.offsetTop+testata.offsetHeight)));
+    if(testata.style.getPropertyValue("--testata-giu")!==giu+"px") testata.style.setProperty("--testata-giu",giu+"px");
+  };
+  new MutationObserver(aggiorna).observe(pannello,{attributes:true,attributeFilter:["style"]});
+  aggiorna();
+});
+</script>
+<style id="aree-sicure">
+/* iPhone: la pagina continua sotto la barra di stato e sotto la barra di Safari
+   (viewport-fit=cover); testi e tasti restano fuori dalle zone occupate dalle
+   barre grazie a env(safe-area-inset-*), che altrove vale 0. */
+:root{--ribbon-gap:calc(12px + env(safe-area-inset-top,0px))}
+html,body{background-color:#090D17}
+.masthead{padding-top:calc(52px + env(safe-area-inset-top,0px))}
+.wrap{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+@media (min-width:761px){.masthead{padding-top:calc(38px + env(safe-area-inset-top,0px))}}
+@media (max-width:560px){
+  .masthead{padding-top:calc(38px + env(safe-area-inset-top,0px))}
+  .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+}
+</style>
+<style id="barre-safari">
+/* Safari 26 su iPhone/iPad colora le barre in base agli elementi fissi che trova
+   sui bordi dello schermo. Due strisce sottili, scritte direttamente nella pagina
+   (così ci sono già al primo disegno, anche ricaricando):
+   - in alto nera (zona della barra di stato + 4 px);
+   - in basso trasparente: sotto la barra di Safari si vede la pagina.
+   Solo su iPhone/iPad: altrove restano nascoste. */
+.barra-safari{display:none}
+@supports (-webkit-touch-callout:none){
+  html,body{background-color:#03050B}
+  .barra-safari{display:block;position:fixed;left:0;right:0;z-index:2147483646;pointer-events:auto}
+  .barra-safari.su{top:0;height:calc(env(safe-area-inset-top,0px) + 4px);background-color:#03050B}
+  .barra-safari.giu{bottom:0;height:4px;background-color:transparent}
+}
+</style>
 </head>
 <body>
+<div class="barra-safari su" aria-hidden="true"></div><div class="barra-safari giu" aria-hidden="true"></div>
 
 <div id="sky" aria-hidden="true">
   <div class="neb a"></div><div class="neb b"></div>
@@ -2368,6 +2414,14 @@ const COPERTINE_ATTIVE = true;
    tutte le copertine a ogni apertura. Incrementare questo valore soltanto
    quando vengono sostituite delle immagini mantenendo lo stesso nome. */
 const CACHE_BUST = "20260907-1";
+/* Copertine in WebP grandi quanto servono (il doppio della misura a schermo su
+   PC, il triplo su telefono anche a scheda ingrandita): stesso aspetto, file e
+   decodifica piu' leggeri. Le poche dove il WebP non conveniva restano originali. */
+const COPERTINE_ORIGINALI = new Set(["MandoStagione2Poster.webp", "andor stagione 2.webp", "andor.jpg", "bad batch stagione 3.webp", "boba-fett.jpg", "clone-wars-film.jpg", "darth-vader-2015-vol2-ombre-e-segreti.jpg", "impero-a-pezzi.jpg", "mandalorian-and-grogu.jpg", "mando stagione 3.jpeg", "maul-shadow-lord.jpg", "rebels stagione 1.webp", "rebels stagione 2.webp", "rebels stagione 3.webp", "resistance stagione 2.webp", "skeleton-crew.jpg", "star-wars-2015-vol2-resa-dei-conti-luna-contrabbandieri.jpg"]);
+function percorsoCopertina(img, grande){
+  if(COPERTINE_ORIGINALI.has(img)) return (grande ? "immagini/" : "immagini-ridotte/") + img;
+  return "copertine/" + (grande ? "f-" : "r-") + img.replace(/\.[^.]+$/, "") + ".webp";
+}
 
 /* Ordine sequenziale ufficiale Lucasfilm. Il codice compatto indica
    stagione ed episodio nella numerazione di pubblicazione (es. 216 = S2 E16). */
@@ -2740,6 +2794,7 @@ const SCALA_SCHEDA_INGRANDITA = SCALA_SCHEDA_CHIUSA * 1.6;
 OPERE.forEach((o,i)=>o.id = slug(o.ti)+"-"+i);
 const OPERE_PER_ID = new Map(OPERE.map(o=>[o.id,o]));
 
+
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
   .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,42)}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
@@ -3034,7 +3089,7 @@ function voce(o, lato){
     : `${fumettoAperto?"Chiudi":"Apri"} i numeri contenuti in ${o.ti}`;
   const meta = [tipoLab, o.rl].concat(o.lg?["Legends"]:[]);
   const mostraImg = COPERTINE_ATTIVE && o.img;
-  const src = mostraImg ? `<img data-shot data-src="${tipo==="film"||tipo==="gioco"?"immagini":"immagini-ridotte"}/${esc(o.img)}?v=${CACHE_BUST}" alt="" draggable="false" loading="eager" decoding="async">` : "";
+  const src = mostraImg ? `<img data-shot data-src="${esc(percorsoCopertina(o.img, tipo==="film"||tipo==="gioco"))}?v=${CACHE_BUST}" alt="" draggable="false" loading="eager" decoding="async">` : "";
   return `<li class="item ${lato} ${o.lg?"legends":""} ${schedeIngrandite.has(o.id)?"mobile-ingrandita":""} ${haGuidaEpisodi?"has-episode-guide":""} ${guidaAperta?"episode-guide-open":""} ${haGuidaFumetto?"has-comic-guide":""} ${fumettoAperto?"comic-guide-open":""}" id="opera-${o.id}" data-opera-tipo="${esc(tipo)}">
     <${tagTesta} class="head"${interattiva?` type="button" aria-expanded="${String(guidaAperta || fumettoAperto)}" aria-controls="${idPannello}" aria-label="${esc(ariaLabel)}"`:""}>
       <figure class="shot${mostraImg?"":" vuoto"}" data-tipo="${esc(tipoLab)}">${src}</figure>
@@ -3811,7 +3866,9 @@ window.addEventListener("resize", ()=>{
    netto), quindi il rimpicciolimento finisce proprio quando resta
    attaccato alla barra di ricerca, senza salti. */
 const RIBBON_RANGE = 160;
-const RIBBON_GAP = 12; /* deve combaciare con --ribbon-gap nel CSS */
+/* deve combaciare con --ribbon-gap nel CSS: 12 px piu' l'eventuale zona della
+   barra di stato dell'iPhone (env(safe-area-inset-top), altrove 0) */
+const RIBBON_GAP = 12 + (()=>{ const d=document.createElement("div"); d.style.cssText="position:absolute;visibility:hidden;padding-top:env(safe-area-inset-top,0px)"; document.documentElement.append(d); const v=parseFloat(getComputedStyle(d).paddingTop)||0; d.remove(); return v; })();
 const PASSI_MISURA_HEADER = 10;
 let progressoHeaderCorrente = 0;
 let corsaHeader = RIBBON_RANGE;
@@ -4327,13 +4384,23 @@ if(location.hash.startsWith("#opera-")){
   st.textContent="@keyframes stelleCiclo{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-820px,0)}}"
     +"#stelle .layer{animation:stelleCiclo 1s linear both;animation-timeline:scroll(root block)}";
   document.head.append(st);
-  const aggiorna=()=>{
-    const max=Math.max(1,document.documentElement.scrollHeight-document.documentElement.clientHeight);
-    strati.forEach(el=>el.style.animationIterationCount=(max*Number(el.dataset.depth)/820).toFixed(5));
-  };
-  aggiorna();
-  addEventListener("resize",aggiorna);
-  if("ResizeObserver" in window) new ResizeObserver(aggiorna).observe(document.body);
+  /* Il ciclo e' legato a un tratto fisso di scorrimento (CORSA px) invece che
+     all'altezza della pagina: quando un riquadro si espande la pagina si
+     allunga, ma lo spostamento delle stelle resta scorrimento x profondita'
+     e non salta piu' (prima si ricalcolava un fotogramma in ritardo). */
+  const CORSA=500000;
+  if(CSS.supports("animation-range","0px 1px")){
+    st.textContent+="#stelle .layer{animation-range:0px "+CORSA+"px}";
+    strati.forEach(el=>el.style.animationIterationCount=(CORSA*Number(el.dataset.depth)/820).toFixed(5));
+  }else{
+    const aggiorna=()=>{
+      const max=Math.max(1,document.documentElement.scrollHeight-document.documentElement.clientHeight);
+      strati.forEach(el=>el.style.animationIterationCount=(max*Number(el.dataset.depth)/820).toFixed(5));
+    };
+    aggiorna();
+    addEventListener("resize",aggiorna);
+    if("ResizeObserver" in window) new ResizeObserver(aggiorna).observe(document.body);
+  }
   aggiornaParallasse = ()=>{};
 })();
 </script>
